@@ -20,8 +20,10 @@ CircularShortTermFourierTransform::~CircularShortTermFourierTransform() {
         
         // platform specific resources
 #if defined(__APPLE__)
-        vDSP_destroy_fftsetup(_fft_config);
+        vDSP_DFT_DestroySetup(_fft_config);
         
+        free(_fft_input.realp);
+        free(_fft_input.imagp);
         free(_fft_output.realp);
         free(_fft_output.imagp);
 #else
@@ -66,10 +68,12 @@ bool CircularShortTermFourierTransform::Initialize(unsigned int window_length, u
     
     // platform specific memory
 #if defined(__APPLE__)
+    _fft_input.realp = (fft_value_t *)malloc(sizeof(fft_value_t) * _fft_length_half);
+    _fft_input.imagp = (fft_value_t *)malloc(sizeof(fft_value_t) * _fft_length_half);
     _fft_output.realp = (fft_value_t *)malloc(sizeof(fft_value_t) * _fft_length_half);
     _fft_output.imagp = (fft_value_t *)malloc(sizeof(fft_value_t) * _fft_length_half);
     
-    _fft_config = vDSP_create_fftsetup(_fft_size, FFT_RADIX2);
+    _fft_config = vDSP_DFT_zrop_CreateSetup(NULL, _fft_length, vDSP_DFT_FORWARD);
 #else
     
 #endif
@@ -183,10 +187,10 @@ bool CircularShortTermFourierTransform::ReadPower(fft_value_t *power) {
     
 #if defined(__APPLE__)
     // pack samples
-    vDSP_ctoz((DSPComplex *)_samples_windowed, 2, &_fft_output, 1, _fft_length_half);
+    vDSP_ctoz((DSPComplex *)_samples_windowed, 2, &_fft_input, 1, _fft_length_half);
     
     // calculate fft
-    vDSP_fft_zrip(_fft_config, &_fft_output, 1, _fft_size, FFT_FORWARD);
+    vDSP_DFT_Execute(_fft_config, _fft_input.realp, _fft_input.imagp, _fft_output.realp, _fft_output.imagp);
     
     // zero imaginary first term (term 0 and term _fft_length_half are both real, and so get
     // packed into the same term)

@@ -52,7 +52,8 @@ private:
     
     // platform specific variables
 #if defined(__APPLE__)
-    FFTSetup _fft_config;
+    vDSP_DFT_Setup _fft_config;
+    DSPSplitComplex _fft_input;
     DSPSplitComplex _fft_output;
 #else
     
