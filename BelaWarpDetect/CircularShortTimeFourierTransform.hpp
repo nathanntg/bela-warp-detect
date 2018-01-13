@@ -19,8 +19,11 @@ typedef vDSP_Length fft_length_t;
 typedef vDSP_Stride fft_stride_t;
 typedef float fft_value_t;
 #else
+#include <ne10/NE10.h> // NEON FFT library
 
-
+typedef unsigned int fft_length_t;
+typedef int fft_stride_t;
+typedef ne10_float32_t fft_value_t;
 #endif
 
 
@@ -56,8 +59,8 @@ private:
     DSPSplitComplex _fft_input;
     DSPSplitComplex _fft_output;
 #else
-    
-    
+    ne10_fft_r2c_cfg_float32_t _fft_config;
+    ne10_fft_cpx_float32_t *_fft_output;
 #endif
     
     fft_length_t _fft_size;
@@ -75,3 +78,4 @@ private:
 };
 
 #endif /* CircularShortTimeFourierTransform_hpp */
+

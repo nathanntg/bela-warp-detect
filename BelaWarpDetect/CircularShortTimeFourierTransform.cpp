@@ -27,7 +27,9 @@ CircularShortTermFourierTransform::~CircularShortTermFourierTransform() {
         free(_fft_output.realp);
         free(_fft_output.imagp);
 #else
+        NE10_FREE(_fft_config);
         
+        NE10_FREE(_fft_output);
 #endif
         
         // release resources
@@ -75,7 +77,9 @@ bool CircularShortTermFourierTransform::Initialize(unsigned int window_length, u
     
     _fft_config = vDSP_DFT_zrop_CreateSetup(NULL, _fft_length, vDSP_DFT_FORWARD);
 #else
+    _fft_output = (ne10_fft_cpx_float32_t *)NE10_MALLOC(sizeof(ne10_fft_cpx_float32_t) * _fft_length);
     
+    _fft_config = ne10_fft_alloc_r2c_float32(_fft_length);
 #endif
     
     // success
@@ -101,7 +105,7 @@ bool CircularShortTermFourierTransform::SetWindow(const std::vector<fft_value_t>
     
     return true;
 }
-    
+
 // get length
 unsigned int CircularShortTermFourierTransform::GetLengthValues() {
     if (!_initialized) {
@@ -147,7 +151,7 @@ bool CircularShortTermFourierTransform::WriteValues(const std::vector<fft_value_
     }
     
     // TODO: rewrite to use copy
-    for (auto it = values.begin(); it != values.end(); ++it) {
+    for (std::vector<fft_value_t>::const_iterator it = values.begin(); it != values.end(); ++it) {
         _buffer[_ptr_write] = *it;
         _ptr_write = (_ptr_write + 1) % _buffer_size;
     }
@@ -204,10 +208,13 @@ bool CircularShortTermFourierTransform::ReadPower(fft_value_t *power) {
     float c_two = 0.5;
     vDSP_vsmul(power, 1, &c_two, power, 1, _fft_length_half + 1);
 #else
+    // claculate FFT
+    ne10_fft_r2c_1d_float32_neon(_fft_output, _samples_windowed, _fft_config);
     
-    
+    for (unsigned int i = 0; i < _fft_length_half + 1; ++i) {
+        power[i] = sqrt(pow(_fft_output[i].r, 2.) + pow(_fft_output[i].i, 2.));
+    }
 #endif
     
     return true;
 }
-

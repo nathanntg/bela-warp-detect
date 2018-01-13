@@ -27,6 +27,7 @@
 /* Begin PBXFileReference section */
 		D831CB532007F2E0008C67E3 /* BelaWarpDetect */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BelaWarpDetect; sourceTree = BUILT_PRODUCTS_DIR; };
 		D831CB562007F2E0008C67E3 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		D85CBA5320098AF300ACD86A /* render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = render.cpp; sourceTree = "<group>"; };
 		D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CircularShortTimeFourierTransform.cpp; sourceTree = "<group>"; };
 		D884B7BE20080529005CFC9D /* CircularShortTimeFourierTransform.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CircularShortTimeFourierTransform.hpp; sourceTree = "<group>"; };
 		D884B7C120092CD4005CFC9D /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -67,6 +68,7 @@
 				D831CB562007F2E0008C67E3 /* main.cpp */,
 				D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */,
 				D884B7BE20080529005CFC9D /* CircularShortTimeFourierTransform.hpp */,
+				D85CBA5320098AF300ACD86A /* render.cpp */,
 			);
 			path = BelaWarpDetect;
 			sourceTree = "<group>";
