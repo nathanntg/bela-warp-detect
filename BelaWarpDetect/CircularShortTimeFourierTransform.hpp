@@ -26,7 +26,7 @@ typedef int fft_stride_t;
 typedef ne10_float32_t fft_value_t;
 #endif
 
-
+/// A circular buffer that produces a spectrogram (calculating a short term fourier transform).
 class CircularShortTermFourierTransform
 {
 public:
@@ -34,12 +34,20 @@ public:
     ~CircularShortTermFourierTransform();
     
     bool Initialize(unsigned int window_length, unsigned int window_stride);
+    
+    // window
+    bool GetWindow(std::vector<fft_value_t>& window);
     bool SetWindow(const std::vector<fft_value_t>& window);
+    void SetWindowHanning();
+    void SetWindowHamming();
     
     // get length
     unsigned int GetLengthValues();
     unsigned int GetLengthCapacity();
     unsigned int GetLengthPower();
+    
+    // clear all data in the circular buffer
+    void Clear();
     
     // write to the circular buffer
     bool WriteValues(const std::vector<fft_value_t>& values);
@@ -47,6 +55,7 @@ public:
     
     // read power
     bool ReadPower(fft_value_t *power);
+    bool ReadPower(std::vector<fft_value_t>& power);
     
 private:
     bool _initialized;

@@ -87,6 +87,21 @@ bool CircularShortTermFourierTransform::Initialize(unsigned int window_length, u
     return true;
 }
 
+bool CircularShortTermFourierTransform::GetWindow(std::vector<fft_value_t>& window) {
+    // initialized
+    if (!_initialized) {
+        return false;
+    }
+    
+    // ensure sufficient space
+    if (window.size() != _window_length) {
+        window.resize(_window_length);
+    }
+    
+    memcpy(&window[0], _window, sizeof(fft_value_t) * _window_length);
+    return true;
+}
+
 bool CircularShortTermFourierTransform::SetWindow(const std::vector<fft_value_t>& window) {
     // initialized
     if (!_initialized) {
@@ -104,6 +119,22 @@ bool CircularShortTermFourierTransform::SetWindow(const std::vector<fft_value_t>
     }
     
     return true;
+}
+
+void CircularShortTermFourierTransform::SetWindowHanning() {
+    for (fft_length_t i = 0, j = _window_length - 1; i <= j; ++i, --j) {
+        float v = 0.5 * (1.0 - cos(2.0 * M_PI * (float)(i + 1) / ((float)(_window_length + 1))));
+        _window[i] = v;
+        _window[j] = v;
+    }
+}
+
+void CircularShortTermFourierTransform::SetWindowHamming() {
+    for (fft_length_t i = 0, j = _window_length - 1; i <= j; ++i, --j) {
+        float v = 0.54 - 0.46 * cos(2.0 * M_PI * (float)i / (float)(_window_length - 1));
+        _window[i] = v;
+        _window[j] = v;
+    }
 }
 
 // get length
@@ -143,6 +174,11 @@ unsigned int CircularShortTermFourierTransform::GetLengthPower() {
     return _fft_length_half + 1;
 }
 
+void CircularShortTermFourierTransform::Clear() {
+    _ptr_read = 0;
+    _ptr_write = 0;
+}
+
 // write to the circular buffer
 bool CircularShortTermFourierTransform::WriteValues(const std::vector<fft_value_t>& values) {
     // check for sufficient space
@@ -176,6 +212,11 @@ bool CircularShortTermFourierTransform::WriteValues(const fft_value_t *values, c
 
 // read power
 bool CircularShortTermFourierTransform::ReadPower(fft_value_t *power) {
+    // initialized
+    if (!_initialized) {
+        return false;
+    }
+    
     // check for sufficient values
     if (GetLengthValues() < _window_length) {
         return false;
@@ -217,4 +258,13 @@ bool CircularShortTermFourierTransform::ReadPower(fft_value_t *power) {
 #endif
     
     return true;
+}
+
+bool CircularShortTermFourierTransform::ReadPower(std::vector<fft_value_t>& power) {
+    // ensure sufficient space
+    if (power.size() != GetLengthPower()) {
+        power.resize(GetLengthPower());
+    }
+    
+    return ReadPower(&power[0]);
 }
