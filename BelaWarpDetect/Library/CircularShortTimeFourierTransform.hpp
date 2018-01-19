@@ -43,6 +43,7 @@ public:
     
     // get length
     unsigned int GetLengthValues();
+    unsigned int GetLengthColumns();
     unsigned int GetLengthCapacity();
     unsigned int GetLengthPower();
     

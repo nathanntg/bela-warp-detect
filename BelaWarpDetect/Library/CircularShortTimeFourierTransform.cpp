@@ -150,6 +150,11 @@ unsigned int CircularShortTermFourierTransform::GetLengthValues() {
     return _buffer_size + _ptr_write - _ptr_read;
 }
 
+// get length in terms of number of columns (convenience)
+unsigned int CircularShortTermFourierTransform::GetLengthColumns() {
+    return ConvertSamplesToColumns(GetLengthValues());
+}
+
 unsigned int CircularShortTermFourierTransform::GetLengthCapacity() {
     if (!_initialized) {
         return 0;
@@ -206,9 +211,11 @@ unsigned int CircularShortTermFourierTransform::ConvertFrequencyToIndex(float fr
 
 void CircularShortTermFourierTransform::ZeroPadToEdge() {
     unsigned int samples = GetLengthValues();
-    unsigned int desired_samples = ConvertColumnsToSamples(ConvertSamplesToColumns(samples));
+    unsigned int used_samples = ConvertColumnsToSamples(ConvertSamplesToColumns(samples));
     
-    if (desired_samples > samples) {
+    // not all samples used? should zero pad
+    if (used_samples < samples) {
+        unsigned int desired_samples = ConvertColumnsToSamples(ConvertSamplesToColumns(samples) + 1);
         unsigned int diff = desired_samples - samples;
         
         std::vector<fft_value_t> zeros(diff, 0.0);
