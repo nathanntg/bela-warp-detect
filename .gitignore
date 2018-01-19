@@ -215,3 +215,8 @@ xcuserdata/
 ####
 # UNKNOWN: recommended by others, but I can't discover what these files are
 #
+
+
+####
+# OTHER
+/TestBelaWarpDetect/catch.hpp

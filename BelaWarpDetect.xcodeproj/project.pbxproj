@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		D831CB572007F2E0008C67E3 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D831CB562007F2E0008C67E3 /* main.cpp */; };
+		D855A8FA2012557B00BF97FD /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D855A8F92012557B00BF97FD /* main.cpp */; };
+		D855A8FF201255DC00BF97FD /* TestCircularShortTimeFourierTransform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D855A8FE201255DC00BF97FD /* TestCircularShortTimeFourierTransform.cpp */; };
+		D855A900201255E300BF97FD /* CircularShortTimeFourierTransform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */; };
+		D855A901201255E500BF97FD /* DynamicTimeMatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88DF471200D54740076F5EE /* DynamicTimeMatcher.cpp */; };
+		D855A902201258D700BF97FD /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D884B7C120092CD4005CFC9D /* Accelerate.framework */; };
 		D884B7BF20080529005CFC9D /* CircularShortTimeFourierTransform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */; };
 		D884B7C220092CD4005CFC9D /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D884B7C120092CD4005CFC9D /* Accelerate.framework */; };
 		D88DF473200D54740076F5EE /* DynamicTimeMatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88DF471200D54740076F5EE /* DynamicTimeMatcher.cpp */; };
@@ -23,11 +28,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		D855A8F52012557B00BF97FD /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		D831CB532007F2E0008C67E3 /* BelaWarpDetect */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BelaWarpDetect; sourceTree = BUILT_PRODUCTS_DIR; };
 		D831CB562007F2E0008C67E3 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		D855A8F72012557B00BF97FD /* TestBelaWarpDetect */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TestBelaWarpDetect; sourceTree = BUILT_PRODUCTS_DIR; };
+		D855A8F92012557B00BF97FD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		D855A8FE201255DC00BF97FD /* TestCircularShortTimeFourierTransform.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TestCircularShortTimeFourierTransform.cpp; sourceTree = "<group>"; };
 		D85CBA5320098AF300ACD86A /* render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = render.cpp; sourceTree = "<group>"; };
 		D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CircularShortTimeFourierTransform.cpp; sourceTree = "<group>"; };
 		D884B7BE20080529005CFC9D /* CircularShortTimeFourierTransform.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CircularShortTimeFourierTransform.hpp; sourceTree = "<group>"; };
@@ -35,6 +52,7 @@
 		D88DF471200D54740076F5EE /* DynamicTimeMatcher.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DynamicTimeMatcher.cpp; sourceTree = "<group>"; };
 		D88DF472200D54740076F5EE /* DynamicTimeMatcher.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DynamicTimeMatcher.hpp; sourceTree = "<group>"; };
 		D898B9B9200EF9CD0090338B /* dtm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dtm.cpp; sourceTree = "<group>"; };
+		D8AACCFB201254EA007A1A93 /* catch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = catch.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,6 +64,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D855A8F42012557B00BF97FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D855A902201258D700BF97FD /* Accelerate.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -53,6 +79,7 @@
 			isa = PBXGroup;
 			children = (
 				D831CB552007F2E0008C67E3 /* BelaWarpDetect */,
+				D8AACCFA201254D5007A1A93 /* TestBelaWarpDetect */,
 				D831CB542007F2E0008C67E3 /* Products */,
 				D884B7C020092CD4005CFC9D /* Frameworks */,
 			);
@@ -62,6 +89,7 @@
 			isa = PBXGroup;
 			children = (
 				D831CB532007F2E0008C67E3 /* BelaWarpDetect */,
+				D855A8F72012557B00BF97FD /* TestBelaWarpDetect */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,9 +98,9 @@
 			isa = PBXGroup;
 			children = (
 				D8AACCF820124445007A1A93 /* Library */,
+				D8AACCF920125462007A1A93 /* Bela */,
 				D8AACCF720124421007A1A93 /* Matlab */,
 				D831CB562007F2E0008C67E3 /* main.cpp */,
-				D85CBA5320098AF300ACD86A /* render.cpp */,
 			);
 			path = BelaWarpDetect;
 			sourceTree = "<group>";
@@ -104,6 +132,24 @@
 			path = Library;
 			sourceTree = "<group>";
 		};
+		D8AACCF920125462007A1A93 /* Bela */ = {
+			isa = PBXGroup;
+			children = (
+				D85CBA5320098AF300ACD86A /* render.cpp */,
+			);
+			path = Bela;
+			sourceTree = "<group>";
+		};
+		D8AACCFA201254D5007A1A93 /* TestBelaWarpDetect */ = {
+			isa = PBXGroup;
+			children = (
+				D8AACCFB201254EA007A1A93 /* catch.hpp */,
+				D855A8F92012557B00BF97FD /* main.cpp */,
+				D855A8FE201255DC00BF97FD /* TestCircularShortTimeFourierTransform.cpp */,
+			);
+			path = TestBelaWarpDetect;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -124,6 +170,23 @@
 			productReference = D831CB532007F2E0008C67E3 /* BelaWarpDetect */;
 			productType = "com.apple.product-type.tool";
 		};
+		D855A8F62012557B00BF97FD /* TestBelaWarpDetect */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D855A8FD2012557B00BF97FD /* Build configuration list for PBXNativeTarget "TestBelaWarpDetect" */;
+			buildPhases = (
+				D855A8F32012557B00BF97FD /* Sources */,
+				D855A8F42012557B00BF97FD /* Frameworks */,
+				D855A8F52012557B00BF97FD /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TestBelaWarpDetect;
+			productName = TestBelaWarpDetect;
+			productReference = D855A8F72012557B00BF97FD /* TestBelaWarpDetect */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -134,6 +197,10 @@
 				ORGANIZATIONNAME = "Nathan Perkins";
 				TargetAttributes = {
 					D831CB522007F2E0008C67E3 = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+					D855A8F62012557B00BF97FD = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
 					};
@@ -152,6 +219,7 @@
 			projectRoot = "";
 			targets = (
 				D831CB522007F2E0008C67E3 /* BelaWarpDetect */,
+				D855A8F62012557B00BF97FD /* TestBelaWarpDetect */,
 			);
 		};
 /* End PBXProject section */
@@ -164,6 +232,17 @@
 				D884B7BF20080529005CFC9D /* CircularShortTimeFourierTransform.cpp in Sources */,
 				D831CB572007F2E0008C67E3 /* main.cpp in Sources */,
 				D88DF473200D54740076F5EE /* DynamicTimeMatcher.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D855A8F32012557B00BF97FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D855A900201255E300BF97FD /* CircularShortTimeFourierTransform.cpp in Sources */,
+				D855A8FF201255DC00BF97FD /* TestCircularShortTimeFourierTransform.cpp in Sources */,
+				D855A8FA2012557B00BF97FD /* main.cpp in Sources */,
+				D855A901201255E500BF97FD /* DynamicTimeMatcher.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,6 +370,24 @@
 			};
 			name = Release;
 		};
+		D855A8FB2012557B00BF97FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WRZPP65FJN;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D855A8FC2012557B00BF97FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WRZPP65FJN;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -308,6 +405,15 @@
 			buildConfigurations = (
 				D831CB5B2007F2E0008C67E3 /* Debug */,
 				D831CB5C2007F2E0008C67E3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D855A8FD2012557B00BF97FD /* Build configuration list for PBXNativeTarget "TestBelaWarpDetect" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D855A8FB2012557B00BF97FD /* Debug */,
+				D855A8FC2012557B00BF97FD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

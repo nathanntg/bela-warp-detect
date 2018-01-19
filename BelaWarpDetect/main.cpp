@@ -13,7 +13,6 @@
 #include "CircularShortTimeFourierTransform.hpp"
 
 int main(int argc, const char * argv[]) {
-    
     CircularShortTermFourierTransform stft;
     stft.Initialize(256, 224);
     
