@@ -13,3 +13,17 @@ reducing the need to amass a huge amount of data or perform a long training proc
 The detection is designed to be usable from MATLAB (for training and performance 
 evaluation), and is designed to be run on a [Bela](http://bela.io) embedded platform 
 (which uses a real time operating system and is capable of audio signal processing).
+
+
+Requirements
+------------
+
+The code supports:
+
+* macOS (with a few additional requirements), via either the C++ API or MATLAB MEX files
+* Bela embedded platform
+
+To use on macOS, you must install:
+
+* [libsndfile](http://www.mega-nerd.com/libsndfile/) - The same framework used by Bela for loading audio files. (Could potentially remove this requirement by using system APIs for parsing audio.)
+* Xcode - The project is packaged as an Xcode project for building and testing, and installing Xcode installs the necessary compiler and other functionality for compiling the mex files.

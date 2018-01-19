@@ -13,6 +13,11 @@
 		D855A900201255E300BF97FD /* CircularShortTimeFourierTransform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */; };
 		D855A901201255E500BF97FD /* DynamicTimeMatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88DF471200D54740076F5EE /* DynamicTimeMatcher.cpp */; };
 		D855A902201258D700BF97FD /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D884B7C120092CD4005CFC9D /* Accelerate.framework */; };
+		D855A905201279C100BF97FD /* LoadAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D855A903201279C100BF97FD /* LoadAudio.cpp */; };
+		D855A906201279C100BF97FD /* LoadAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D855A903201279C100BF97FD /* LoadAudio.cpp */; };
+		D855A92E20128E0800BF97FD /* libsndfile.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D855A92D20128E0800BF97FD /* libsndfile.1.dylib */; };
+		D855A92F20128E1800BF97FD /* libsndfile.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D855A92D20128E0800BF97FD /* libsndfile.1.dylib */; };
+		D855A9312012912200BF97FD /* TestLoadAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D855A9302012912200BF97FD /* TestLoadAudio.cpp */; };
 		D884B7BF20080529005CFC9D /* CircularShortTimeFourierTransform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */; };
 		D884B7C220092CD4005CFC9D /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D884B7C120092CD4005CFC9D /* Accelerate.framework */; };
 		D88DF473200D54740076F5EE /* DynamicTimeMatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88DF471200D54740076F5EE /* DynamicTimeMatcher.cpp */; };
@@ -45,6 +50,10 @@
 		D855A8F72012557B00BF97FD /* TestBelaWarpDetect */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TestBelaWarpDetect; sourceTree = BUILT_PRODUCTS_DIR; };
 		D855A8F92012557B00BF97FD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		D855A8FE201255DC00BF97FD /* TestCircularShortTimeFourierTransform.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TestCircularShortTimeFourierTransform.cpp; sourceTree = "<group>"; };
+		D855A903201279C100BF97FD /* LoadAudio.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LoadAudio.cpp; sourceTree = "<group>"; };
+		D855A904201279C100BF97FD /* LoadAudio.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LoadAudio.hpp; sourceTree = "<group>"; };
+		D855A92D20128E0800BF97FD /* libsndfile.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsndfile.1.dylib; path = ../../../../../../usr/local/lib/libsndfile.1.dylib; sourceTree = "<group>"; };
+		D855A9302012912200BF97FD /* TestLoadAudio.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TestLoadAudio.cpp; sourceTree = "<group>"; };
 		D85CBA5320098AF300ACD86A /* render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = render.cpp; sourceTree = "<group>"; };
 		D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CircularShortTimeFourierTransform.cpp; sourceTree = "<group>"; };
 		D884B7BE20080529005CFC9D /* CircularShortTimeFourierTransform.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CircularShortTimeFourierTransform.hpp; sourceTree = "<group>"; };
@@ -60,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D855A92F20128E1800BF97FD /* libsndfile.1.dylib in Frameworks */,
 				D884B7C220092CD4005CFC9D /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -68,6 +78,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D855A92E20128E0800BF97FD /* libsndfile.1.dylib in Frameworks */,
 				D855A902201258D700BF97FD /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -108,6 +119,7 @@
 		D884B7C020092CD4005CFC9D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D855A92D20128E0800BF97FD /* libsndfile.1.dylib */,
 				D884B7C120092CD4005CFC9D /* Accelerate.framework */,
 			);
 			name = Frameworks;
@@ -128,6 +140,8 @@
 				D884B7BE20080529005CFC9D /* CircularShortTimeFourierTransform.hpp */,
 				D88DF471200D54740076F5EE /* DynamicTimeMatcher.cpp */,
 				D88DF472200D54740076F5EE /* DynamicTimeMatcher.hpp */,
+				D855A903201279C100BF97FD /* LoadAudio.cpp */,
+				D855A904201279C100BF97FD /* LoadAudio.hpp */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -146,6 +160,7 @@
 				D8AACCFB201254EA007A1A93 /* catch.hpp */,
 				D855A8F92012557B00BF97FD /* main.cpp */,
 				D855A8FE201255DC00BF97FD /* TestCircularShortTimeFourierTransform.cpp */,
+				D855A9302012912200BF97FD /* TestLoadAudio.cpp */,
 			);
 			path = TestBelaWarpDetect;
 			sourceTree = "<group>";
@@ -229,6 +244,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D855A905201279C100BF97FD /* LoadAudio.cpp in Sources */,
 				D884B7BF20080529005CFC9D /* CircularShortTimeFourierTransform.cpp in Sources */,
 				D831CB572007F2E0008C67E3 /* main.cpp in Sources */,
 				D88DF473200D54740076F5EE /* DynamicTimeMatcher.cpp in Sources */,
@@ -241,7 +257,9 @@
 			files = (
 				D855A900201255E300BF97FD /* CircularShortTimeFourierTransform.cpp in Sources */,
 				D855A8FF201255DC00BF97FD /* TestCircularShortTimeFourierTransform.cpp in Sources */,
+				D855A906201279C100BF97FD /* LoadAudio.cpp in Sources */,
 				D855A8FA2012557B00BF97FD /* main.cpp in Sources */,
+				D855A9312012912200BF97FD /* TestLoadAudio.cpp in Sources */,
 				D855A901201255E500BF97FD /* DynamicTimeMatcher.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -357,6 +375,8 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WRZPP65FJN;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -366,6 +386,8 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WRZPP65FJN;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -375,6 +397,8 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WRZPP65FJN;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -384,6 +408,8 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WRZPP65FJN;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
