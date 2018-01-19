@@ -14,7 +14,7 @@
 
 struct dtm_out {
     float score;
-    unsigned int len; // length of match in signal space
+    int len_diff; // length of match in signal space
 };
 
 class DynamicTimeMatcher

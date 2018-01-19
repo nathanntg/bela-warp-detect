@@ -39,13 +39,13 @@ CircularShortTermFourierTransform::~CircularShortTermFourierTransform() {
     }
 }
 
-bool CircularShortTermFourierTransform::Initialize(unsigned int window_length, unsigned int window_stride) {
+bool CircularShortTermFourierTransform::Initialize(unsigned int window_length, unsigned int window_stride, unsigned int buffer_size) {
     // already initialized?
     if (_initialized) {
         return false;
     }
     
-    _buffer_size = 4096;
+    _buffer_size = buffer_size;
     
     _window_length = (fft_length_t)window_length;
     _window_stride = (fft_stride_t)window_stride;
@@ -177,6 +177,43 @@ unsigned int CircularShortTermFourierTransform::GetLengthPower() {
 void CircularShortTermFourierTransform::Clear() {
     _ptr_read = 0;
     _ptr_write = 0;
+}
+
+unsigned int CircularShortTermFourierTransform::ConvertSamplesToColumns(unsigned int samples) {
+    if (samples < _window_length) {
+        return 0;
+    }
+    
+    return 1 + (samples - _window_length) / _window_stride;
+}
+
+unsigned int CircularShortTermFourierTransform::ConvertColumnsToSamples(unsigned int columns) {
+    if (columns == 0) {
+        return 0;
+    }
+    
+    return _window_length + (_window_stride * (columns - 1));
+}
+
+float CircularShortTermFourierTransform::ConvertIndexToFrequency(unsigned int index, float sample_rate) {
+    return (float)index * sample_rate / (float)_fft_length;
+}
+
+// next higher frequency bin
+unsigned int CircularShortTermFourierTransform::ConvertFrequencyToIndex(float frequency, float sample_rate) {
+    return (unsigned int)ceil((float)_fft_length * frequency / sample_rate);
+}
+
+void CircularShortTermFourierTransform::ZeroPadToEdge() {
+    unsigned int samples = GetLengthValues();
+    unsigned int desired_samples = ConvertColumnsToSamples(ConvertSamplesToColumns(samples));
+    
+    if (desired_samples > samples) {
+        unsigned int diff = desired_samples - samples;
+        
+        std::vector<fft_value_t> zeros(diff, 0.0);
+        WriteValues(zeros);
+    }
 }
 
 // write to the circular buffer

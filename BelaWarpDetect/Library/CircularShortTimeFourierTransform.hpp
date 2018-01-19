@@ -33,7 +33,7 @@ public:
     CircularShortTermFourierTransform();
     ~CircularShortTermFourierTransform();
     
-    bool Initialize(unsigned int window_length, unsigned int window_stride);
+    bool Initialize(unsigned int window_length, unsigned int window_stride, unsigned int buffer_length = 4096);
     
     // window
     bool GetWindow(std::vector<fft_value_t>& window);
@@ -48,6 +48,15 @@ public:
     
     // clear all data in the circular buffer
     void Clear();
+    
+    // conversion helper functions
+    unsigned int ConvertSamplesToColumns(unsigned int samples);
+    unsigned int ConvertColumnsToSamples(unsigned int columns);
+    float ConvertIndexToFrequency(unsigned int index, float sample_rate);
+    unsigned int ConvertFrequencyToIndex(float frequency, float sample_rate); // next highest frequency bin
+    
+    // zero pad to edge (add zeros at the end to the nearest column boundary)
+    void ZeroPadToEdge();
     
     // write to the circular buffer
     bool WriteValues(const std::vector<fft_value_t>& values);

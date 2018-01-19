@@ -211,8 +211,8 @@ struct dtm_out DynamicTimeMatcher::IngestFeatureVector(const float *features) {
         _cur_len[i + 1] = len;
     }
     
-    ret.score = _cur_score[_length + 1];
-    ret.len = _cur_len[_length + 1];
+    ret.score = _cur_score[_length];
+    ret.len_diff = (int)_cur_len[_length] - (int)_length;
     
     return ret;
 }
