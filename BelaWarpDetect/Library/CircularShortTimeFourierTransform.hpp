@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <vector>
 
+#include "ManagedMemory.hpp"
+
 #if defined(__APPLE__)
 #include <Accelerate/Accelerate.h>
 
@@ -30,13 +32,11 @@ typedef ne10_float32_t fft_value_t;
 class CircularShortTermFourierTransform
 {
 public:
-    CircularShortTermFourierTransform();
+    CircularShortTermFourierTransform(unsigned int window_length, unsigned int window_stride, unsigned int buffer_length = 4096);
     ~CircularShortTermFourierTransform();
     
-    bool Initialize(unsigned int window_length, unsigned int window_stride, unsigned int buffer_length = 4096);
-    
     // window
-    bool GetWindow(std::vector<fft_value_t>& window);
+    std::vector<fft_value_t> GetWindow();
     bool SetWindow(const std::vector<fft_value_t>& window);
     void SetWindowHanning();
     void SetWindowHamming();
@@ -68,7 +68,9 @@ public:
     bool ReadPower(std::vector<fft_value_t>& power);
     
 private:
-    bool _initialized;
+    // prevent copying
+    CircularShortTermFourierTransform(const CircularShortTermFourierTransform &);
+    const CircularShortTermFourierTransform &operator=(const CircularShortTermFourierTransform &);
     
     unsigned int _buffer_size;
     
@@ -88,12 +90,12 @@ private:
     fft_length_t _window_length;
     fft_length_t _window_stride;
     
-    fft_value_t *_window;
-    fft_value_t *_buffer; // circular buffer used to store values
-    unsigned int _ptr_write; // point to write in sample vector
-    unsigned int _ptr_read; // point to read in sample vector
+    ManagedMemory<fft_value_t> _window;
+    ManagedMemory<fft_value_t> _buffer; // circular buffer used to store values
+    unsigned int _ptr_write = 0; // point to write in sample vector
+    unsigned int _ptr_read = 0; // point to read in sample vector
     
-    fft_value_t *_samples_windowed; // store windowed values
+    ManagedMemory<fft_value_t> _samples_windowed; // store windowed values
 };
 
 #endif /* CircularShortTimeFourierTransform_hpp */

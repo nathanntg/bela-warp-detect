@@ -11,58 +11,16 @@
 #include <iostream>
 #include <cmath>
 
-CircularShortTermFourierTransform::CircularShortTermFourierTransform() {
-    _initialized = false;
-}
-
-CircularShortTermFourierTransform::~CircularShortTermFourierTransform() {
-    if (_initialized) {
-        
-        // platform specific resources
-#if defined(__APPLE__)
-        vDSP_DFT_DestroySetup(_fft_config);
-        
-        free(_fft_input.realp);
-        free(_fft_input.imagp);
-        free(_fft_output.realp);
-        free(_fft_output.imagp);
-#else
-        NE10_FREE(_fft_config);
-        
-        NE10_FREE(_fft_output);
-#endif
-        
-        // release resources
-        free(_window);
-        free(_buffer);
-        free(_samples_windowed);
-    }
-}
-
-bool CircularShortTermFourierTransform::Initialize(unsigned int window_length, unsigned int window_stride, unsigned int buffer_size) {
-    // already initialized?
-    if (_initialized) {
-        return false;
-    }
-    
-    _buffer_size = buffer_size;
-    
-    _window_length = (fft_length_t)window_length;
-    _window_stride = (fft_stride_t)window_stride;
-    
-    _fft_size = (fft_length_t)ceil(log2(window_length));
-    _fft_length = 1 << _fft_size;
-    _fft_length_half = _fft_length / 2;
-    
-    // allocate buffer
-    _buffer = (fft_value_t *)malloc(sizeof(fft_value_t) * _buffer_size);
-    _ptr_read = 0;
-    _ptr_write = 0;
-    
-    // allocate other memory
-    _window = (fft_value_t *)malloc(sizeof(fft_value_t) * _window_length);
-    _samples_windowed = (fft_value_t *)calloc(_fft_length, sizeof(fft_value_t));
-    
+CircularShortTermFourierTransform::CircularShortTermFourierTransform(unsigned int window_length, unsigned int window_stride, unsigned int buffer_size) :
+_buffer_size(buffer_size),
+_window_length(window_length),
+_window_stride(window_stride),
+_fft_size((fft_length_t)ceil(log2(window_length))),
+_fft_length(1 << _fft_size),
+_fft_length_half(_fft_length / 2),
+_buffer(buffer_size),
+_window(_window_length),
+_samples_windowed(_fft_length) {
     // initialize window to 1s
     for (unsigned int i = 0; i < _window_length; ++i) {
         _window[i] = 1.;
@@ -70,10 +28,10 @@ bool CircularShortTermFourierTransform::Initialize(unsigned int window_length, u
     
     // platform specific memory
 #if defined(__APPLE__)
-    _fft_input.realp = (fft_value_t *)malloc(sizeof(fft_value_t) * _fft_length_half);
-    _fft_input.imagp = (fft_value_t *)malloc(sizeof(fft_value_t) * _fft_length_half);
-    _fft_output.realp = (fft_value_t *)malloc(sizeof(fft_value_t) * _fft_length_half);
-    _fft_output.imagp = (fft_value_t *)malloc(sizeof(fft_value_t) * _fft_length_half);
+    _fft_input.realp = new fft_value_t[_fft_length_half];
+    _fft_input.imagp = new fft_value_t[_fft_length_half];
+    _fft_output.realp = new fft_value_t[_fft_length_half];
+    _fft_output.imagp = new fft_value_t[_fft_length_half];
     
     _fft_config = vDSP_DFT_zrop_CreateSetup(NULL, _fft_length, vDSP_DFT_FORWARD);
 #else
@@ -81,33 +39,31 @@ bool CircularShortTermFourierTransform::Initialize(unsigned int window_length, u
     
     _fft_config = ne10_fft_alloc_r2c_float32(_fft_length);
 #endif
-    
-    // success
-    _initialized = true;
-    return true;
 }
 
-bool CircularShortTermFourierTransform::GetWindow(std::vector<fft_value_t>& window) {
-    // initialized
-    if (!_initialized) {
-        return false;
-    }
+CircularShortTermFourierTransform::~CircularShortTermFourierTransform() {
+    // platform specific resources
+#if defined(__APPLE__)
+    vDSP_DFT_DestroySetup(_fft_config);
     
-    // ensure sufficient space
-    if (window.size() != _window_length) {
-        window.resize(_window_length);
-    }
+    delete[] _fft_input.realp;
+    delete[] _fft_input.imagp;
+    delete[] _fft_output.realp;
+    delete[] _fft_output.imagp;
+#else
+    NE10_FREE(_fft_config);
     
-    memcpy(&window[0], _window, sizeof(fft_value_t) * _window_length);
-    return true;
+    NE10_FREE(_fft_output);
+#endif
+}
+
+std::vector<fft_value_t> CircularShortTermFourierTransform::GetWindow() {
+    std::vector<fft_value_t> ret = std::vector<fft_value_t>(_window_length);
+    memcpy(&ret[0], _window.ptr(), sizeof(fft_value_t) * _window_length);
+    return ret;
 }
 
 bool CircularShortTermFourierTransform::SetWindow(const std::vector<fft_value_t>& window) {
-    // initialized
-    if (!_initialized) {
-        return false;
-    }
-    
     // check window length
     if (window.size() != _window_length) {
         return false;
@@ -139,10 +95,6 @@ void CircularShortTermFourierTransform::SetWindowHamming() {
 
 // get length
 unsigned int CircularShortTermFourierTransform::GetLengthValues() {
-    if (!_initialized) {
-        return 0;
-    }
-    
     if (_ptr_write >= _ptr_read) {
         return _ptr_write - _ptr_read;
     }
@@ -156,10 +108,6 @@ unsigned int CircularShortTermFourierTransform::GetLengthColumns() {
 }
 
 unsigned int CircularShortTermFourierTransform::GetLengthCapacity() {
-    if (!_initialized) {
-        return 0;
-    }
-    
     // ptr_read == ptr_write means empty, therefore can not be completely full
     // can store up to buffer_size - 1
     
@@ -172,10 +120,6 @@ unsigned int CircularShortTermFourierTransform::GetLengthCapacity() {
 }
 
 unsigned int CircularShortTermFourierTransform::GetLengthPower() {
-    if (!_initialized) {
-        return 0;
-    }
-    
     return _fft_length_half + 1;
 }
 
@@ -256,11 +200,6 @@ bool CircularShortTermFourierTransform::WriteValues(const fft_value_t *values, c
 
 // read power
 bool CircularShortTermFourierTransform::ReadPower(fft_value_t *power) {
-    // initialized
-    if (!_initialized) {
-        return false;
-    }
-    
     // check for sufficient values
     if (GetLengthValues() < _window_length) {
         return false;
@@ -276,7 +215,7 @@ bool CircularShortTermFourierTransform::ReadPower(fft_value_t *power) {
     
 #if defined(__APPLE__)
     // pack samples
-    vDSP_ctoz((DSPComplex *)_samples_windowed, 2, &_fft_input, 1, _fft_length_half);
+    vDSP_ctoz((DSPComplex *)_samples_windowed.ptr(), 2, &_fft_input, 1, _fft_length_half);
     
     // calculate fft
     vDSP_DFT_Execute(_fft_config, _fft_input.realp, _fft_input.imagp, _fft_output.realp, _fft_output.imagp);

@@ -10,26 +10,62 @@
 #include <vector>
 #include <time.h>
 
-#include "CircularShortTimeFourierTransform.hpp"
+#include "MatchSyllables.hpp"
+#include "LoadAudio.hpp"
+
+std::vector<std::vector<float>> result_score;
+std::vector<std::vector<int>> result_length;
+
+void cbPrintResult(int index, float score, int length) {
+    std::cout << "Syllabe " << index << ": " << score << " (" << length << ")\n";
+}
+
+void cbAppendResult(std::vector<float> scores, std::vector<int> lengths) {
+    result_score.push_back(scores);
+    result_length.push_back(lengths);
+}
 
 int main(int argc, const char * argv[]) {
-    CircularShortTermFourierTransform stft;
-    stft.Initialize(256, 224);
+    std::vector<float> signal;
+    float sampling_rate;
     
-    // profile
-    clock_t begin, end;
-    double tm = 0;
-    unsigned int iter = 100;
-    for (unsigned int i = 0; i < iter; ++i) {
-        stft.WriteValues(values);
-        
-        begin = clock();
-        stft.ReadPower(&power[0]);
-        end = clock();
-        
-        tm += (double)(end - begin) / CLOCKS_PER_SEC;
+    // load audio
+    if (!LoadAudio("Matlab/audio.wav", signal, sampling_rate)) {
+        std::cerr << "Unable to load audio file.\n";
+        return 1;
     }
-    printf("Avg Time: %.5fms\n", tm * 1000 / (double)iter);
+    
+    // create matcher
+    MatchSyllables ms(sampling_rate);
+    
+    // add syllable
+    if (ms.AddSyllable("Matlab/template.wav", 2900.0) == -1) {
+        std::cerr << "Unable to add syllable.\n";
+        return 1;
+    }
+    
+    // set callback
+    ms.SetCallbackMatch(cbPrintResult);
+    ms.SetCallbackColumn(cbAppendResult);
+    
+    // initialize
+    if (!ms.Initialize()) {
+        std::cerr << "Unable to initialize syllable matcher.\n";
+        return 1;
+    }
+    
+    // chunks
+    size_t chunk_size = 1024;
+    std::vector<float>::iterator begin = signal.begin();
+    for (size_t i = 0; i < signal.size(); i += chunk_size) {
+        std::vector<float> chunk = std::vector<float>(begin + i, begin + (i + chunk_size < signal.size() ? i + chunk_size : signal.size()));
+        if (!ms.IngestAudio(chunk)) {
+            std::cerr << "Error while ingesting audio.\n";
+            return 1;
+        }
+    }
+    
+    std::cout << result_score.size() << "\n";
     
     return 0;
 }

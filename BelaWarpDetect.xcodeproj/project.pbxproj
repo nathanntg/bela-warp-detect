@@ -18,6 +18,8 @@
 		D855A92E20128E0800BF97FD /* libsndfile.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D855A92D20128E0800BF97FD /* libsndfile.1.dylib */; };
 		D855A92F20128E1800BF97FD /* libsndfile.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D855A92D20128E0800BF97FD /* libsndfile.1.dylib */; };
 		D855A9312012912200BF97FD /* TestLoadAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D855A9302012912200BF97FD /* TestLoadAudio.cpp */; };
+		D8807BB82017CC0C0091942D /* TestManagedMemory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8807BB62017CC0C0091942D /* TestManagedMemory.cpp */; };
+		D8849C0120139520009EE2D4 /* MatchSyllables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8849BFF20139520009EE2D4 /* MatchSyllables.cpp */; };
 		D884B7BF20080529005CFC9D /* CircularShortTimeFourierTransform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */; };
 		D884B7C220092CD4005CFC9D /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D884B7C120092CD4005CFC9D /* Accelerate.framework */; };
 		D88DF473200D54740076F5EE /* DynamicTimeMatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88DF471200D54740076F5EE /* DynamicTimeMatcher.cpp */; };
@@ -55,6 +57,11 @@
 		D855A92D20128E0800BF97FD /* libsndfile.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsndfile.1.dylib; path = ../../../../../../usr/local/lib/libsndfile.1.dylib; sourceTree = "<group>"; };
 		D855A9302012912200BF97FD /* TestLoadAudio.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TestLoadAudio.cpp; sourceTree = "<group>"; };
 		D85CBA5320098AF300ACD86A /* render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = render.cpp; sourceTree = "<group>"; };
+		D8807BB32017C8230091942D /* ManagedMemory.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ManagedMemory.hpp; sourceTree = "<group>"; };
+		D8807BB62017CC0C0091942D /* TestManagedMemory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TestManagedMemory.cpp; sourceTree = "<group>"; };
+		D8849BFF20139520009EE2D4 /* MatchSyllables.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MatchSyllables.cpp; sourceTree = "<group>"; };
+		D8849C0020139520009EE2D4 /* MatchSyllables.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MatchSyllables.hpp; sourceTree = "<group>"; };
+		D8849C032013D614009EE2D4 /* match_syllables.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = match_syllables.cpp; sourceTree = "<group>"; };
 		D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CircularShortTimeFourierTransform.cpp; sourceTree = "<group>"; };
 		D884B7BE20080529005CFC9D /* CircularShortTimeFourierTransform.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CircularShortTimeFourierTransform.hpp; sourceTree = "<group>"; };
 		D884B7C120092CD4005CFC9D /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -129,6 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				D898B9B9200EF9CD0090338B /* dtm.cpp */,
+				D8849C032013D614009EE2D4 /* match_syllables.cpp */,
 			);
 			path = Matlab;
 			sourceTree = "<group>";
@@ -136,12 +144,15 @@
 		D8AACCF820124445007A1A93 /* Library */ = {
 			isa = PBXGroup;
 			children = (
+				D8807BB32017C8230091942D /* ManagedMemory.hpp */,
 				D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */,
 				D884B7BE20080529005CFC9D /* CircularShortTimeFourierTransform.hpp */,
 				D88DF471200D54740076F5EE /* DynamicTimeMatcher.cpp */,
 				D88DF472200D54740076F5EE /* DynamicTimeMatcher.hpp */,
 				D855A903201279C100BF97FD /* LoadAudio.cpp */,
 				D855A904201279C100BF97FD /* LoadAudio.hpp */,
+				D8849BFF20139520009EE2D4 /* MatchSyllables.cpp */,
+				D8849C0020139520009EE2D4 /* MatchSyllables.hpp */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -161,6 +172,7 @@
 				D855A8F92012557B00BF97FD /* main.cpp */,
 				D855A8FE201255DC00BF97FD /* TestCircularShortTimeFourierTransform.cpp */,
 				D855A9302012912200BF97FD /* TestLoadAudio.cpp */,
+				D8807BB62017CC0C0091942D /* TestManagedMemory.cpp */,
 			);
 			path = TestBelaWarpDetect;
 			sourceTree = "<group>";
@@ -246,6 +258,7 @@
 			files = (
 				D855A905201279C100BF97FD /* LoadAudio.cpp in Sources */,
 				D884B7BF20080529005CFC9D /* CircularShortTimeFourierTransform.cpp in Sources */,
+				D8849C0120139520009EE2D4 /* MatchSyllables.cpp in Sources */,
 				D831CB572007F2E0008C67E3 /* main.cpp in Sources */,
 				D88DF473200D54740076F5EE /* DynamicTimeMatcher.cpp in Sources */,
 			);
@@ -256,6 +269,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D855A900201255E300BF97FD /* CircularShortTimeFourierTransform.cpp in Sources */,
+				D8807BB82017CC0C0091942D /* TestManagedMemory.cpp in Sources */,
 				D855A8FF201255DC00BF97FD /* TestCircularShortTimeFourierTransform.cpp in Sources */,
 				D855A906201279C100BF97FD /* LoadAudio.cpp in Sources */,
 				D855A8FA2012557B00BF97FD /* main.cpp in Sources */,

@@ -36,6 +36,11 @@ fprintf('Compiling functions...\n');
 
 c = {};
 cf = {};
+lf = {};
+
+% add general include path
+cf{end + 1} = '-I/usr/local/include';
+lf{end + 1} = '-L/usr/local/lib';
 
 % show warnings
 if warnings
@@ -60,13 +65,19 @@ if numel(cf) > 0
     c{end + 1} = ['CFLAGS="\$CFLAGS ' strjoin(cf) '"'];
 end
 
+% include sndfile
+lf{end + 1} = '-lsndfile.1';
+
 % include Accelerate framework
 if ismac
-    c{end + 1} = 'LDFLAGS="\$LDFLAGS -framework Accelerate"';
+    lf{end + 1} = '-framework Accelerate';
 end
 
+c{end + 1} = ['LDFLAGS="\$LDFLAGS ' strjoin(lf) '"'];
+
 % call mex functions
-functions = {{'Matlab/dtm.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp'}};
+functions = {{'Matlab/dtm.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp'}, ...
+    {'Matlab/match_syllables.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp', 'Library/LoadAudio.cpp', 'Library/MatchSyllables.cpp'}};
 for j = 1:length(functions)
     if iscell(functions{j})
         fprintf('%s\n', functions{j}{1});

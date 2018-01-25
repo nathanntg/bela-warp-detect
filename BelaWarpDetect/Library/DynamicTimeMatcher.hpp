@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <vector>
 
+#include "ManagedMemory.hpp"
+
 struct dtm_out {
     float score;
     int len_diff; // length of match in signal space
@@ -20,10 +22,9 @@ struct dtm_out {
 class DynamicTimeMatcher
 {
 public:
-    DynamicTimeMatcher();
+    DynamicTimeMatcher(const std::vector<std::vector<float>> &templ);
     ~DynamicTimeMatcher();
     
-    bool Initialize(const std::vector<std::vector<float>>& templ);
     bool SetAlpha(float alpha);
     bool SetAlpha(const std::vector<float>& alpha);
     
@@ -35,16 +36,14 @@ public:
 private:
     float _ScoreFeatures(const float *tmpl_feature, const float *signal_feature);
     
-    bool _initialized;
+    size_t _features; // number of features in each step of the template
+    size_t _length; // number of feature vectors in the template
     
-    unsigned int _features; // number of features in each step of the template
-    unsigned int _length; // number of feature vectors in the template
+    ManagedMemory<float> _alpha; // size = _features
+    ManagedMemory<float> _tmpl; // size = _features * _length
     
-    float *_alpha; // size = _features
-    float *_tmpl; // size = _features * _length
-    
-    float *_dpp_score[2];
-    unsigned int *_dpp_len[2];
+    ManagedMemory<float> _dpp_score;
+    ManagedMemory<unsigned int> _dpp_len;
     unsigned int _idx; // index in the dynamic plex propogation
 };
 
