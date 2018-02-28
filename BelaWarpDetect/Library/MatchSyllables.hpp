@@ -13,7 +13,6 @@
 #include <string>
 #include <vector>
 #include <list>
-#include <limits>
 
 #include "CircularShortTimeFourierTransform.hpp"
 #include "DynamicTimeMatcher.hpp"
@@ -22,11 +21,11 @@ struct ms_dtm {
     size_t index;
     DynamicTimeMatcher dtm;
     float threshold;
-    float length;
+    float threshold_length;
     float last_score;
     int last_len;
     
-    ms_dtm(size_t index_, const std::vector<std::vector<float>> &tmpl, float threshold_, float length_) : index(index_), dtm(tmpl), threshold(threshold_), length(length_), last_score(std::numeric_limits<float>::max()), last_len(0) {
+    ms_dtm(size_t index_, const std::vector<std::vector<float>> &tmpl, float threshold_, float threshold_length_) : index(index_), dtm(tmpl), threshold(threshold_), threshold_length(threshold_length_), last_score(std::numeric_limits<float>::max()), last_len(0) {
         
     }
 };

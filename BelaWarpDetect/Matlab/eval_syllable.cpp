@@ -126,7 +126,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     MatchSyllables ms(sampling_rate);
     
     /* add syllable */
-    if (ms.AddSyllable(syllable, -1e6) == -1) {
+    if (ms.AddSyllable(syllable, 1e6) == -1) {
         mexErrMsgIdAndTxt("MATLAB:es:internalError", "Unable to add the syllable to the matcher.");
     }
     

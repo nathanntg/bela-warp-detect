@@ -17,6 +17,7 @@ _length(templ.size()),
 _features(templ[0].size()),
 _tmpl(_features * _length),
 _alpha(_length),
+_normalize(0),
 _dpp_score(2 * (_length + 1)),
 _dpp_len(2 * (_length + 1)) {
     // require non-zero length and feature size
@@ -35,6 +36,9 @@ _dpp_len(2 * (_length + 1)) {
         // copy template features
         memcpy(_tmpl.ptr() + (i * _features), &templ[i][0], sizeof(float) * _features);
     }
+    
+    // calculate normalization
+    _CalculateNormalize();
     
     // allocate alpha
     SetAlpha(1.0);
@@ -82,6 +86,29 @@ void DynamicTimeMatcher::Reset() {
     }
 }
 
+void DynamicTimeMatcher::_CalculateNormalize() {
+    _normalize = 0.f;
+    
+    // compare with zeros
+    // ALTERNATIVE IDEA: compare to scaled version of self
+    ManagedMemory<float> zeros(_features);
+    
+    for (size_t i = 0; i < _length; ++i) {
+        _normalize += _ScoreFeatures(_tmpl.ptr() + (i * _features), zeros.ptr());
+    }
+}
+
+float DynamicTimeMatcher::_NormalizeScore(float score) {
+    float normalized = (_normalize - score) / _normalize;
+    if (normalized < 0.f) {
+        return 0.f;
+    }
+    if (normalized > 1.f) {
+        return 1.f;
+    }
+    return normalized;
+}
+
 float DynamicTimeMatcher::_ScoreFeatures(const float *tmpl_feature, const float *signal_feature) {
     float result = 0;
     float tt, ss;
@@ -95,7 +122,7 @@ float DynamicTimeMatcher::_ScoreFeatures(const float *tmpl_feature, const float 
 
 struct dtm_out DynamicTimeMatcher::IngestFeatureVector(const float *features) {
     // error response
-    struct dtm_out ret = {-1.0, 0};
+    struct dtm_out ret = {-1.0, -1.0, 0};
     
     // pointers to alternating DPP results
     float *_lst_score;
@@ -158,6 +185,7 @@ struct dtm_out DynamicTimeMatcher::IngestFeatureVector(const float *features) {
     }
     
     ret.score = _cur_score[_length];
+    ret.normalized_score = _NormalizeScore(_cur_score[_length]);
     ret.len_diff = static_cast<int>(_cur_len[_length]) - static_cast<int>(_length);
     
     return ret;

@@ -69,6 +69,7 @@ for i = 1:length(keys)
 end
 
 %% second pass: score syllables
+
 scores = nan(total, length(syllables));
 lengths = nan(total, length(syllables));
 actual = zeros(total, 1);

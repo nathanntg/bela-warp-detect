@@ -135,7 +135,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     std::vector<float> syllable;
     for (unsigned int i = 2; i < nrhs; ++i) {
         getVector(prhs[i], syllable, "MATLAB:ms:invalidInput", "Each syllable must be a real vector.");
-        if (ms.AddSyllable(syllable, 0.0) == -1) {
+        if (ms.AddSyllable(syllable, 1.0) == -1) {
             mexErrMsgIdAndTxt("MATLAB:ms:invalidInput", "Unable to add syllable.");
         }
     }

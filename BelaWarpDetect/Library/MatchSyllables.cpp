@@ -6,8 +6,6 @@
 //  Copyright © 2018 Nathan Perkins. All rights reserved.
 //
 
-#include <limits>
-
 #include "MatchSyllables.hpp"
 #include "LoadAudio.hpp"
 
@@ -105,7 +103,7 @@ void MatchSyllables::Reset() {
         // flush matches
         for (auto it = _dtms.begin(); it != _dtms.end(); ++it) {
             it->dtm.Reset();
-            it->last_score = std::numeric_limits<float>::max(); // resetting length does not matter
+            it->last_score = 0.f;
         }
     }
 }
@@ -148,9 +146,9 @@ void MatchSyllables::_PerformMatching() {
             struct dtm_out out = it->dtm.IngestFeatureVector(&_power[_idx_lo]);
             
             // was last time point below theshold, below length constraint and a local minimum?
-            if (it->last_score < it->threshold && abs(static_cast<float>(it->last_len)) < it->length && out.score > it->last_score) {
+            if (it->last_score < it->threshold && abs(static_cast<float>(it->last_len)) < it-> threshold_length && out.score > it->last_score) {
                 // ALTERNATIVE:
-                //if (out.score < _dtms[i].threshold && abs((float)out.len_diff) < _dtms[i].length) {
+                //if (out.score >= _dtms[i].threshold && abs((float)out.len_diff) < _dtms[i].length) {
                 //}
                 
                 // call match callback
@@ -162,12 +160,12 @@ void MatchSyllables::_PerformMatching() {
                 // reset DTM? OR reset all?
                 it->dtm.Reset();
                 
-                // max out score to prevent double trigger
-                out.score = std::numeric_limits<float>::max();
+                // zero out score to prevent double trigger
+                out.normalized_score = 0.f;
             }
             
             // store last
-            it->last_score = out.score;
+            it->last_score = out.normalized_score;
             it->last_len = out.len_diff;
         }
         
