@@ -15,7 +15,7 @@ _stft(_window_length, _window_stride, _buffer_length),
 _idx_lo(_stft.ConvertFrequencyToIndex(_freq_lo, _sample_rate)),
 _idx_hi(_stft.ConvertFrequencyToIndex(_freq_hi, _sample_rate)),
 _features(_stft.GetLengthPower()) {
-    
+    _stft.SetWindowHamming();
 }
 
 MatchSyllables::~MatchSyllables() {
