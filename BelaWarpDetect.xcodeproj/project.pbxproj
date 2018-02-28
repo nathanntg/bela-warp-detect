@@ -57,6 +57,7 @@
 		D855A92D20128E0800BF97FD /* libsndfile.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsndfile.1.dylib; path = ../../../../../../usr/local/lib/libsndfile.1.dylib; sourceTree = "<group>"; };
 		D855A9302012912200BF97FD /* TestLoadAudio.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TestLoadAudio.cpp; sourceTree = "<group>"; };
 		D85CBA5320098AF300ACD86A /* render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = render.cpp; sourceTree = "<group>"; };
+		D8661E352020F4710025B4D7 /* eval_syllable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = eval_syllable.cpp; sourceTree = "<group>"; };
 		D8807BB32017C8230091942D /* ManagedMemory.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ManagedMemory.hpp; sourceTree = "<group>"; };
 		D8807BB62017CC0C0091942D /* TestManagedMemory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TestManagedMemory.cpp; sourceTree = "<group>"; };
 		D8849BFF20139520009EE2D4 /* MatchSyllables.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MatchSyllables.cpp; sourceTree = "<group>"; };
@@ -137,6 +138,7 @@
 			children = (
 				D898B9B9200EF9CD0090338B /* dtm.cpp */,
 				D8849C032013D614009EE2D4 /* match_syllables.cpp */,
+				D8661E352020F4710025B4D7 /* eval_syllable.cpp */,
 			);
 			path = Matlab;
 			sourceTree = "<group>";

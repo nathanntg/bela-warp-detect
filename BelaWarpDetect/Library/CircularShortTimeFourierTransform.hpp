@@ -84,11 +84,12 @@ private:
     ne10_fft_cpx_float32_t *_fft_output;
 #endif
     
+    fft_length_t _window_length;
+    fft_length_t _window_stride;
+    
     fft_length_t _fft_size;
     fft_length_t _fft_length;
     fft_length_t _fft_length_half;
-    fft_length_t _window_length;
-    fft_length_t _window_stride;
     
     ManagedMemory<fft_value_t> _window;
     ManagedMemory<fft_value_t> _buffer; // circular buffer used to store values

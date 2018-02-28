@@ -15,7 +15,7 @@ CircularShortTermFourierTransform::CircularShortTermFourierTransform(unsigned in
 _buffer_size(buffer_size),
 _window_length(window_length),
 _window_stride(window_stride),
-_fft_size((fft_length_t)ceil(log2(window_length))),
+_fft_size(static_cast<fft_length_t>(ceil(log2(window_length)))),
 _fft_length(1 << _fft_size),
 _fft_length_half(_fft_length / 2),
 _buffer(buffer_size),
@@ -79,7 +79,7 @@ bool CircularShortTermFourierTransform::SetWindow(const std::vector<fft_value_t>
 
 void CircularShortTermFourierTransform::SetWindowHanning() {
     for (fft_length_t i = 0, j = _window_length - 1; i <= j; ++i, --j) {
-        float v = 0.5 * (1.0 - cos(2.0 * M_PI * (float)(i + 1) / ((float)(_window_length + 1))));
+        float v = 0.5 * (1.0 - cos(2.0 * M_PI * static_cast<float>(i + 1) / (static_cast<float>(_window_length + 1))));
         _window[i] = v;
         _window[j] = v;
     }
@@ -87,7 +87,7 @@ void CircularShortTermFourierTransform::SetWindowHanning() {
 
 void CircularShortTermFourierTransform::SetWindowHamming() {
     for (fft_length_t i = 0, j = _window_length - 1; i <= j; ++i, --j) {
-        float v = 0.54 - 0.46 * cos(2.0 * M_PI * (float)i / (float)(_window_length - 1));
+        float v = 0.54 - 0.46 * cos(2.0 * M_PI * static_cast<float>(i) / static_cast<float>(_window_length - 1));
         _window[i] = v;
         _window[j] = v;
     }
@@ -145,12 +145,12 @@ unsigned int CircularShortTermFourierTransform::ConvertColumnsToSamples(unsigned
 }
 
 float CircularShortTermFourierTransform::ConvertIndexToFrequency(unsigned int index, float sample_rate) {
-    return (float)index * sample_rate / (float)_fft_length;
+    return static_cast<float>(index) * sample_rate / static_cast<float>(_fft_length);
 }
 
 // next higher frequency bin
 unsigned int CircularShortTermFourierTransform::ConvertFrequencyToIndex(float frequency, float sample_rate) {
-    return (unsigned int)ceil((float)_fft_length * frequency / sample_rate);
+    return static_cast<unsigned int>(ceil(static_cast<float>(_fft_length) * frequency / sample_rate));
 }
 
 void CircularShortTermFourierTransform::ZeroPadToEdge() {
@@ -215,7 +215,7 @@ bool CircularShortTermFourierTransform::ReadPower(fft_value_t *power) {
     
 #if defined(__APPLE__)
     // pack samples
-    vDSP_ctoz((DSPComplex *)_samples_windowed.ptr(), 2, &_fft_input, 1, _fft_length_half);
+    vDSP_ctoz(reinterpret_cast<DSPComplex *>(_samples_windowed.ptr()), 2, &_fft_input, 1, _fft_length_half);
     
     // calculate fft
     vDSP_DFT_Execute(_fft_config, _fft_input.realp, _fft_input.imagp, _fft_output.realp, _fft_output.imagp);

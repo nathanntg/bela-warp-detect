@@ -80,7 +80,6 @@ template <typename T> void getVector(const mxArray *in, std::vector<T> &vec, con
     }
     
     // allocate pointer
-    T *values;
     size_t sn, sm, sl;
     
     // get dimensions
@@ -92,19 +91,19 @@ template <typename T> void getVector(const mxArray *in, std::vector<T> &vec, con
     vec.resize(sl);
     
     if (mxIsDouble(in)) {
-        double *values = (double *)mxGetPr(in);
+        double *values = static_cast<double *>(mxGetPr(in));
         
         // fill vector
         for (size_t i = 0; i < sl; ++i) {
-            vec[i] = (T)values[i];
+            vec[i] = static_cast<T>(values[i]);
         }
     }
     else if (mxIsSingle(in)) {
-        float *values = (float *)mxGetPr(in);
+        float *values = reinterpret_cast<float *>(mxGetPr(in));
         
         // fill vector
         for (size_t i = 0; i < sl; ++i) {
-            vec[i] = (T)values[i];
+            vec[i] = static_cast<T>(values[i]);
         }
     }
 }
@@ -121,7 +120,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     /* read arguments */
     getVector(prhs[0], templ, "MATLAB:dtm:invalidInput", "The template must be a real vector.");
     getVector(prhs[1], signal, "MATLAB:dtm:invalidInput", "The signal must be a real vector.");
-    sampling_rate = (float)getScalar(prhs[2], "MATLAB:dtm:invalidInput", "The sampling rate must be a real scalar.");
+    sampling_rate = static_cast<float>(getScalar(prhs[2], "MATLAB:dtm:invalidInput", "The sampling rate must be a real scalar."));
     
     /* parameters */
     unsigned int stft_len = 512, stft_stride = 40;
@@ -173,7 +172,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         auto result = dtm.IngestFeatureVector(std::vector<float>(col.begin() + idx_lo, col.begin() + idx_hi));
         
         // append to results
-        scores[i] = (double)result.score;
-        lengths[i] = (double)result.len_diff;
+        scores[i] = static_cast<double>(result.score);
+        lengths[i] = static_cast<double>(result.len_diff);
     }
 }

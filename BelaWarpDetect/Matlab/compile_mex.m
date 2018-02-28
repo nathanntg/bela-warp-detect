@@ -44,7 +44,7 @@ lf{end + 1} = '-L/usr/local/lib';
 
 % show warnings
 if warnings
-    cf{end + 1} = '-Weverything';
+    cf{end + 1} = '-Weverything -Wno-c++98-compat';
 end
 
 % enable debugging
@@ -77,7 +77,8 @@ c{end + 1} = ['LDFLAGS="\$LDFLAGS ' strjoin(lf) '"'];
 
 % call mex functions
 functions = {{'Matlab/dtm.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp'}, ...
-    {'Matlab/match_syllables.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp', 'Library/LoadAudio.cpp', 'Library/MatchSyllables.cpp'}};
+    {'Matlab/match_syllables.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp', 'Library/LoadAudio.cpp', 'Library/MatchSyllables.cpp'}, ...
+    {'Matlab/eval_syllable.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp', 'Library/LoadAudio.cpp', 'Library/MatchSyllables.cpp'}};
 for j = 1:length(functions)
     if iscell(functions{j})
         fprintf('%s\n', functions{j}{1});

@@ -14,9 +14,9 @@
 MatchSyllables::MatchSyllables(float sample_rate) :
 _sample_rate(sample_rate),
 _stft(_window_length, _window_stride, _buffer_length),
-_power(_stft.GetLengthPower()),
 _idx_lo(_stft.ConvertFrequencyToIndex(_freq_lo, _sample_rate)),
-_idx_hi(_stft.ConvertFrequencyToIndex(_freq_hi, _sample_rate)) {
+_idx_hi(_stft.ConvertFrequencyToIndex(_freq_hi, _sample_rate)),
+_power(_stft.GetLengthPower()) {
     
 }
 
@@ -24,7 +24,7 @@ MatchSyllables::~MatchSyllables() {
     
 }
 
-void MatchSyllables::SetCallbackMatch(void (*cb)(int, float, int)) {
+void MatchSyllables::SetCallbackMatch(void (*cb)(size_t, float, int)) {
     _cb_match = cb;
 }
 
@@ -54,10 +54,10 @@ int MatchSyllables::AddSyllable(const std::vector<float> &audio, float threshold
     }
     
     // add at end
-    int index = _next_index++;
-    _dtms.emplace_back(index, tmpl, threshold, constrain_length * (float)tmpl.size());
+    size_t index = _next_index++;
+    _dtms.emplace_back(index, tmpl, threshold, constrain_length * static_cast<float>(tmpl.size()));
     
-    return index;
+    return static_cast<int>(index);
 }
 
 int MatchSyllables::AddSyllable(const std::string file, float threshold, float constrain_length) {
@@ -146,10 +146,9 @@ void MatchSyllables::_PerformMatching() {
     while (_stft.ReadPower(_power)) {
         for (auto it = _dtms.begin(); it != _dtms.end(); ++it) {
             struct dtm_out out = it->dtm.IngestFeatureVector(&_power[_idx_lo]);
-        
             
             // was last time point below theshold, below length constraint and a local minimum?
-            if (it->last_score < it->threshold && abs((float)it->last_len) < it->length && out.score > it->last_score) {
+            if (it->last_score < it->threshold && abs(static_cast<float>(it->last_len)) < it->length && out.score > it->last_score) {
                 // ALTERNATIVE:
                 //if (out.score < _dtms[i].threshold && abs((float)out.len_diff) < _dtms[i].length) {
                 //}
@@ -183,4 +182,28 @@ void MatchSyllables::_PerformMatching() {
             _cb_column(scores, lengths);
         }
     }
+}
+
+bool MatchSyllables::ZeroPadAndFetch(std::vector<float> &scores, std::vector<int> &lengths) {
+    if (!_initialized) {
+        return false;
+    }
+    
+    // zero pad to edge
+    _stft.ZeroPadToEdge();
+    
+    // perform matching
+    _PerformMatching();
+    
+    // resize returns
+    scores.resize(_next_index);
+    lengths.resize(_next_index);
+    
+    // fill last score and last length
+    for (auto it = _dtms.begin(); it != _dtms.end(); ++it) {
+        scores[it->index] = it->last_score;
+        lengths[it->index] = it->last_len;
+    }
+    
+    return true;
 }

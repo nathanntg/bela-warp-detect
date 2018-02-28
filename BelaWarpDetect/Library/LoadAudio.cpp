@@ -26,10 +26,10 @@ bool LoadAudio(std::string file, std::vector<float> &samples, float &sample_rate
     }
     
     // sample rate
-    sample_rate = (float)sf_info.samplerate;
+    sample_rate = static_cast<float>(sf_info.samplerate);
     
     // prepare memory
-    float *mem = (float *)malloc(sizeof(float) * sf_info.channels * sf_info.frames);
+    float *mem = static_cast<float *>(malloc(sizeof(float) * sf_info.channels * sf_info.frames));
     
     // seek start frame
     sf_seek(sf, 0, SEEK_SET);

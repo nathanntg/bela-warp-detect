@@ -1,10 +1,12 @@
 //
-//  match_syllables.cpp
+//  eval_syllable.cpp
 //  BelaWarpDetect
 //
-//  Created by Nathan Perkins on 1/20/18.
+//  Created by Nathan Perkins on 1/30/18.
 //  Copyright © 2018 Nathan Perkins. All rights reserved.
 //
+
+#include <stdio.h>
 
 #include <iostream>
 #include <vector>
@@ -107,69 +109,64 @@ template <typename T> void getVector(const mxArray *in, std::vector<T> &vec, con
     }
 }
 
-std::vector<std::vector<float>> result_score;
-std::vector<std::vector<int>> result_length;
-
-void cbAppendResult(std::vector<float> scores, std::vector<int> lengths) {
-    result_score.push_back(scores);
-    result_length.push_back(lengths);
-}
-
-
 /* the gateway function */
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     float sampling_rate;
-    std::vector<float> signal;
+    std::vector<float> syllable;
     
     /* check for proper number of arguments */
-    MX_TEST(nrhs >= 3, "MATLAB:ms:invalidNumInputs", "Requires three or more inputs (signal, sampling rate and one or more syllables)");
-    MX_TEST(nlhs == 2, "MATLAB:ms:invalidNumOutputs", "Requires two outputs (scores and lengths).");
+    MX_TEST(nrhs >= 3, "MATLAB:es:invalidNumInputs", "Requires three or more inputs (syllable, sampling rate and one or more syllables to evaluate)");
+    MX_TEST(nlhs == 2, "MATLAB:es:invalidNumOutputs", "Requires two outputs (scores and lengths).");
     
     /* read arguments */
-    getVector(prhs[0], signal, "MATLAB:ms:invalidInput", "The signal must be a real vector.");
-    sampling_rate = static_cast<float>(getScalar(prhs[1], "MATLAB:ms:invalidInput", "The sampling rate must be a real scalar."));
+    getVector(prhs[0], syllable, "MATLAB:es:invalidInput", "The syllable must be a real vector.");
+    sampling_rate = static_cast<float>(getScalar(prhs[1], "MATLAB:es:invalidInput", "The sampling rate must be a real scalar."));
     
     /* create matcher */
     MatchSyllables ms(sampling_rate);
     
-    std::vector<float> syllable;
-    for (unsigned int i = 2; i < nrhs; ++i) {
-        getVector(prhs[i], syllable, "MATLAB:ms:invalidInput", "Each syllable must be a real vector.");
-        if (ms.AddSyllable(syllable, 0.0) == -1) {
-            mexErrMsgIdAndTxt("MATLAB:ms:invalidInput", "Unable to add syllable.");
-        }
+    /* add syllable */
+    if (ms.AddSyllable(syllable, -1e6) == -1) {
+        mexErrMsgIdAndTxt("MATLAB:es:internalError", "Unable to add the syllable to the matcher.");
     }
     
-    ms.SetCallbackColumn(cbAppendResult);
-    
-    // initialize
+    /* initialize */
     if (!ms.Initialize()) {
-        mexErrMsgIdAndTxt("MATLAB:ms:internalError", "Unable to initialize syllable matcher.");
-    }
-    
-    // chunks
-    size_t chunk_size = 1024;
-    std::vector<float>::iterator begin = signal.begin();
-    for (size_t i = 0; i < signal.size(); i += chunk_size) {
-        if (!ms.IngestAudio(std::vector<float>(begin + i, begin + (i + chunk_size < signal.size() ? i + chunk_size : signal.size())))) {
-            mexErrMsgIdAndTxt("MATLAB:ms:internalError", "Unable to ingest audio.");
-        }
+        mexErrMsgIdAndTxt("MATLAB:es:internalError", "Unable to initialize syllable matcher.");
     }
     
     // generate outputs
-    size_t rows = result_score.size(), cols = rows > 0 ? result_score[0].size() : 0;
+    size_t results = nrhs - 2;
+    
     double *scores;
     double *lengths;
-    plhs[0] = mxCreateDoubleMatrix(rows, cols, mxREAL);
+    plhs[0] = mxCreateDoubleMatrix(1, results, mxREAL);
     scores = mxGetPr(plhs[0]);
-    plhs[1] = mxCreateDoubleMatrix(rows, cols, mxREAL);
+    plhs[1] = mxCreateDoubleMatrix(1, results, mxREAL);
     lengths = mxGetPr(plhs[1]);
     
-    // fill outputs
-    for (size_t i = 0; i < rows; ++i) {
-        for (size_t j = 0; j < cols; ++j) {
-            scores[i * cols + j] = result_score[i][j];
-            lengths[i * cols + j] = result_length[i][j];
+    // for each syllabe to evaluate
+    std::vector<float> syllable_to_eval;
+    std::vector<float> result_score(1);
+    std::vector<int> result_length(1);
+    for (size_t i = 2; i < nrhs; ++i) {
+        // get input
+        getVector(prhs[i], syllable_to_eval, "MATLAB:es:invalidInput", "The syllable to evaluate must be a real vector.");
+        
+        // reset
+        ms.Reset();
+        
+        // ingest
+        if (!ms.IngestAudio(syllable_to_eval)) {
+            mexErrMsgIdAndTxt("MATLAB:es:internalError", "IngestAudio failed.");
         }
+        
+        // zero pad and fetch output
+        if (!ms.ZeroPadAndFetch(result_score, result_length)) {
+            mexErrMsgIdAndTxt("MATLAB:es:internalError", "ZeroPadAndFetch failed.");
+        }
+        
+        scores[i - 2] = static_cast<double>(result_score[0]);
+        lengths[i - 2] = static_cast<double>(result_length[0]);
     }
 }
