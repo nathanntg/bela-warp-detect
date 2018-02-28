@@ -25,8 +25,17 @@ struct ms_dtm {
     float last_score;
     int last_len;
     
-    ms_dtm(size_t index_, const std::vector<std::vector<float>> &tmpl, float threshold_, float threshold_length_) : index(index_), dtm(tmpl), threshold(threshold_), threshold_length(threshold_length_), last_score(std::numeric_limits<float>::max()), last_len(0) {
+    ms_dtm(size_t index_, const std::vector<std::vector<float>> &tmpl, float threshold_, float threshold_length_) : index(index_), dtm(tmpl), threshold(threshold_), threshold_length(threshold_length_), last_score(0.f), last_len(0) {
+        float a;
+        size_t dtm_length = dtm.GetLength();
+        std::vector<float> alpha(dtm_length);
+        for (size_t i = 0, maxi = (dtm_length / 2) + 1; i < maxi; ++i) {
+            a = 2.f + 1.f * pow(0.9f, static_cast<float>(i));
+            alpha[i] = a;
+            alpha[dtm_length - 1 - i] = a;
+        }
         
+        dtm.SetAlpha(alpha);
     }
 };
 
@@ -58,6 +67,7 @@ public:
     
 private:
     // perform matching
+    bool _ReadFeatures(std::vector<float> &power);
     void _PerformMatching();
     
     bool _initialized = false;
@@ -74,6 +84,7 @@ private:
     const unsigned int _window_stride = 40;
     const float _freq_lo = 1000.0f;
     const float _freq_hi = 10000.0f;
+    const bool _log_power = true;
     
     // circular short term fourier transform
     CircularShortTermFourierTransform _stft;
@@ -82,7 +93,8 @@ private:
     const unsigned int _idx_lo;
     const unsigned int _idx_hi;
     
-    std::vector<float> _power;
+    // current feature column for matching (power)
+    std::vector<float> _features;
     
     // vector of matchers
     std::list<struct ms_dtm> _dtms;

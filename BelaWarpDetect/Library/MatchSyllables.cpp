@@ -14,7 +14,7 @@ _sample_rate(sample_rate),
 _stft(_window_length, _window_stride, _buffer_length),
 _idx_lo(_stft.ConvertFrequencyToIndex(_freq_lo, _sample_rate)),
 _idx_hi(_stft.ConvertFrequencyToIndex(_freq_hi, _sample_rate)),
-_power(_stft.GetLengthPower()) {
+_features(_stft.GetLengthPower()) {
     
 }
 
@@ -28,6 +28,22 @@ void MatchSyllables::SetCallbackMatch(void (*cb)(size_t, float, int)) {
 
 void MatchSyllables::SetCallbackColumn(void (*cb)(std::vector<float>, std::vector<int>)) {
     _cb_column = cb;
+}
+
+bool MatchSyllables::_ReadFeatures(std::vector<float> &features) {
+    if (!_stft.ReadPower(features)) {
+        return false;
+    }
+    
+    // log?
+    if (_log_power) {
+        // potentially only calculate log within indices of interest
+        for (auto it = features.begin(); it != features.end(); ++it) {
+            *it = log(1.f + *it);
+        }
+    }
+    
+    return true;
 }
 
 int MatchSyllables::AddSyllable(const std::vector<float> &audio, float threshold, float constrain_length) {
@@ -47,7 +63,7 @@ int MatchSyllables::AddSyllable(const std::vector<float> &audio, float threshold
     
     // read in template
     std::vector<float> col;
-    while (_stft.ReadPower(col)) {
+    while (_ReadFeatures(col)) {
         tmpl.push_back(std::vector<float>(col.begin() + _idx_lo, col.begin() + _idx_hi));
     }
     
@@ -141,12 +157,12 @@ bool MatchSyllables::IngestAudio(const std::vector<float> &audio) {
 }
 
 void MatchSyllables::_PerformMatching() {
-    while (_stft.ReadPower(_power)) {
+    while (_ReadFeatures(_features)) {
         for (auto it = _dtms.begin(); it != _dtms.end(); ++it) {
-            struct dtm_out out = it->dtm.IngestFeatureVector(&_power[_idx_lo]);
+            struct dtm_out out = it->dtm.IngestFeatureVector(&_features[_idx_lo]);
             
             // was last time point below theshold, below length constraint and a local minimum?
-            if (it->last_score < it->threshold && abs(static_cast<float>(it->last_len)) < it-> threshold_length && out.score > it->last_score) {
+            if (it->last_score >= it->threshold && abs(static_cast<float>(it->last_len)) < it-> threshold_length && out.normalized_score < it->last_score) {
                 // ALTERNATIVE:
                 //if (out.score >= _dtms[i].threshold && abs((float)out.len_diff) < _dtms[i].length) {
                 //}

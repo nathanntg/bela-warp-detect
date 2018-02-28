@@ -33,6 +33,9 @@ public:
     
     float GetNormalize() { return _normalize; }
     
+    size_t GetFeatures() { return _features; }
+    size_t GetLength() { return _length; }
+    
     struct dtm_out IngestFeatureVector(const float *features);
     struct dtm_out IngestFeatureVector(const std::vector<float>& features);
     
