@@ -8,6 +8,7 @@
 
 #include "MatchSyllables.hpp"
 #include "LoadAudio.hpp"
+#include "ManagedMemory.hpp"
 
 MatchSyllables::MatchSyllables(float sample_rate) :
 _sample_rate(sample_rate),
@@ -59,7 +60,7 @@ int MatchSyllables::AddSyllable(const std::vector<float> &audio, float threshold
     _stft.ZeroPadToEdge();
     
     // template for syllable
-    std::vector<std::vector<float>> tmpl;
+    std::vector<const std::vector<float>> tmpl;
     
     // read in template
     std::vector<float> col;
@@ -92,6 +93,68 @@ int MatchSyllables::AddSyllable(const std::string file, float threshold, float c
     }
     
     return AddSyllable(audio, threshold, constrain_length);
+}
+
+int MatchSyllables::AddSpectrogram(const std::vector<const std::vector<float>> &spect, float threshold, float constrain_length) {
+    // invalid feature length
+    if ((_idx_hi - _idx_lo) != spect[0].size()) {
+        return -1;
+    }
+    
+    // add at end
+    size_t index = _next_index++;
+    _dtms.emplace_back(index, spect, threshold, constrain_length * static_cast<float>(spect.size()));
+    
+    return static_cast<int>(index);
+}
+
+int MatchSyllables::AddSpectrogram(const float *spect, size_t length, size_t features, float threshold, float constrain_length) {
+    // invalid feature length
+    if ((_idx_hi - _idx_lo) != features) {
+        return -1;
+    }
+    
+    // add at end
+    size_t index = _next_index++;
+    _dtms.emplace_back(index, spect, length, features, threshold, constrain_length * static_cast<float>(length));
+    
+    return static_cast<int>(index);
+}
+
+int MatchSyllables::AddSpectrogram(const std::string file, float threshold, float constrain_length) {
+    FILE *fh;
+    fh = fopen(file.c_str(), "r");
+    if (!fh) {
+        return -1;
+    }
+    
+    // obtain file size:
+    fseek(fh, 0, SEEK_END);
+    size_t file_length = ftell(fh);
+    rewind(fh);
+    
+    // calculate size
+    size_t features = _idx_hi - _idx_lo;
+    size_t length = file_length / sizeof(float) / features;
+    size_t total = features * length;
+    if (file_length != total * sizeof(float)) {
+        return -1;
+    }
+    
+    // read file
+    ManagedMemory<float> buffer(total);
+    if (total != fread(static_cast<void *>(buffer.ptr()), sizeof(float), total, fh)) {
+        return -1;
+    }
+    
+    // close file
+    fclose(fh);
+    
+    // add at end
+    size_t index = _next_index++;
+    _dtms.emplace_back(index, buffer.ptr(), length, features, threshold, constrain_length * static_cast<float>(length));
+    
+    return static_cast<int>(index);
 }
 
 bool MatchSyllables::Initialize() {

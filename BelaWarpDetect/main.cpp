@@ -16,7 +16,7 @@
 std::vector<std::vector<float>> result_score;
 std::vector<std::vector<int>> result_length;
 
-void cbPrintResult(int index, float score, int length) {
+void cbPrintResult(size_t index, float score, int length) {
     std::cout << "Syllabe " << index << ": " << score << " (" << length << ")\n";
 }
 

@@ -32,10 +32,47 @@ ax2 = subplot(2, 1, 2); plot(len);
 linkaxes([ax2 ax1], 'x');
 
 %% setup
-pth = '~/Documents/School/BU/Gardner Lab/Syllable Match/';
+%pth = '~/Documents/School/BU/Gardner Lab/Syllable Match/';
+pth = '/Volumes/Lab/Gardner Lab/Bela/lbr3009files/';
 fl = 'lbr3009_annotation.mat';
 
 load(fullfile(pth, fl));
+
+%% load audio to make template
+syllables = 1:25;
+templates = cell(1, max(syllables));
+for syllable = syllables
+    audio = {};
+    
+    % for each file
+    for i = 1:length(keys)
+        if ~exist(fullfile(pth, keys{i}), 'file')
+            continue;
+        end
+
+        % get all copies 
+        idx = find(elements{i}.segType == syllable);
+        if isempty(idx)
+            continue;
+        end
+
+        % load audio
+        [y, fs] = audioread(fullfile(pth, keys{i}));
+
+        % unique segments
+        for j = idx'
+            strt = round(elements{i}.segFileStartTimes(j) * fs);
+            stop = round(elements{i}.segFileEndTimes(j) * fs);
+            if (stop - strt) < 512
+                continue;
+            end
+            audio{end + 1} = y(strt:stop);
+        end
+    end
+    
+    [tmpl, weights] = build_template(audio, fs);
+    templates{syllable} = tmpl;
+end
 
 %% first pass: load syllables
 
@@ -136,13 +173,20 @@ for i = 1:length(syllables)
 end
 
 %% visualize
-for i = [2 20]
+for i = [2 7]
     if isempty(syllables{i})
         continue;
     end
     
-    [s, f, t] = spectrogram(syllables{i}, 512, 512-40, 512, fs);
-    f_idx = f > 500 & f < 10000;
+    if numel(syllables{i}) == length(syllables{i})
+        [s, f, t] = spectrogram(syllables{i}, 512, 512-40, 512, fs);
+        f_idx = f > 500 & f < 10000;
+    else
+        s = syllables{i};
+        f = size(s, 1):-1:1;
+        f_idx = f > 0;
+        t = 1:size(s, 2);
+    end
 
     figure;
     imagesc(t, f(f_idx), log(1 + abs(s(f_idx, :))));
