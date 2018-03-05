@@ -100,7 +100,7 @@ function [tmpl, weights] = build_template(audio, fs, varargin)
         audio = [audio; zeros(len - length(audio), 1)];
         
         % window
-        window = hamming(window_length);
+        window = hanning(window_length);
         nfft = 2^ceil(log2(window_length));
         
         % calculate spectrogram
