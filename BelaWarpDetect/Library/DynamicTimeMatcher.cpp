@@ -16,6 +16,7 @@ DynamicTimeMatcher::DynamicTimeMatcher(const std::vector<const std::vector<float
 _length(templ.size()),
 _features(templ[0].size()),
 _tmpl(_features * _length),
+_weight(_features * _length),
 _alpha(_length),
 _normalize(0),
 _dpp_score(2 * (_length + 1)),
@@ -51,6 +52,7 @@ DynamicTimeMatcher::DynamicTimeMatcher(const float *templ, size_t length, size_t
 _length(length),
 _features(features),
 _tmpl(_features * _length),
+_weight(_features * _length),
 _alpha(_length),
 _normalize(0),
 _dpp_score(2 * (_length + 1)),
@@ -95,6 +97,51 @@ bool DynamicTimeMatcher::SetAlpha(const std::vector<float>& alpha) {
     return true;
 }
 
+bool DynamicTimeMatcher::SetWeight(const float *weight) {
+    // copy template features
+    memcpy(_weight.ptr(), weight, sizeof(float) * _length * _features);
+    
+    // enable weights
+    _use_weights = true;
+    
+    // calculate normalization
+    _CalculateNormalize();
+    
+    // reset existing matches
+    Reset();
+    
+    return true;
+}
+
+bool DynamicTimeMatcher::SetWeight(const std::vector<const std::vector<float>>& weight) {
+    if (weight.size() != _length || weight[0].size() != _features) {
+        return false;
+    }
+    
+    // allocate template space
+    for (unsigned int i = 0; i < _length; ++i) {
+        // confirm matching number of features
+        // (maybe throw exception or abort?)
+        if (weight[i].size() != _features) {
+            throw std::invalid_argument("requires constant sized feature vector");
+        }
+        
+        // copy template features
+        memcpy(_weight.ptr() + (i * _features), &weight[i][0], sizeof(float) * _features);
+    }
+    
+    // enable weights
+    _use_weights = true;
+    
+    // calculate normalization
+    _CalculateNormalize();
+    
+    // reset existing matches
+    Reset();
+    
+    return true;
+}
+
 void DynamicTimeMatcher::Reset() {
     // set index to first column of DPP
     _idx = 0;
@@ -115,7 +162,12 @@ void DynamicTimeMatcher::_CalculateNormalize() {
     ManagedMemory<float> zeros(_features);
     
     for (size_t i = 0; i < _length; ++i) {
-        _normalize += _ScoreFeatures(_tmpl.ptr() + (i * _features), zeros.ptr());
+        if (_use_weights) {
+            _normalize += _ScoreFeaturesWeighted(_tmpl.ptr() + (i * _features), zeros.ptr(), _weight.ptr() + (i * _features));
+        }
+        else {
+            _normalize += _ScoreFeatures(_tmpl.ptr() + (i * _features), zeros.ptr());
+        }
     }
 }
 
@@ -137,6 +189,17 @@ float DynamicTimeMatcher::_ScoreFeatures(const float *tmpl_feature, const float 
         tt = tmpl_feature[i];
         ss = signal_feature[i];
         result += ((ss - tt) * (ss - tt));
+    }
+    return sqrt(result);
+}
+
+float DynamicTimeMatcher::_ScoreFeaturesWeighted(const float *tmpl_feature, const float *signal_feature, const float *weights) {
+    float result = 0;
+    float dd, ww;
+    for (unsigned int i = 0; i < _features; ++i) {
+        dd = tmpl_feature[i] - signal_feature[i];
+        ww = weights[i];
+        result += ww * dd * dd;
     }
     return sqrt(result);
 }
@@ -173,7 +236,12 @@ struct dtm_out DynamicTimeMatcher::IngestFeatureVector(const float *features) {
         alpha = _alpha[i];
         
         // current cost
-        cost = _ScoreFeatures(_tmpl.ptr() + (i * _features), features);
+        if (_use_weights) {
+            cost = _ScoreFeaturesWeighted(_tmpl.ptr() + (i * _features), features, _weight.ptr() + (i * _features));
+        }
+        else {
+            cost = _ScoreFeatures(_tmpl.ptr() + (i * _features), features);
+        }
         
         // is nan? (special case)
         if (isnan(cost)) {

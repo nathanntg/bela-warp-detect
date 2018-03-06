@@ -30,6 +30,9 @@ public:
     bool SetAlpha(float alpha);
     bool SetAlpha(const std::vector<float>& alpha);
     
+    bool SetWeight(const float *weight);
+    bool SetWeight(const std::vector<const std::vector<float>>& weight);
+    
     void Reset();
     
     float GetNormalize() { return _normalize; }
@@ -45,13 +48,16 @@ private:
     float _NormalizeScore(float score);
     
     float _ScoreFeatures(const float *tmpl_feature, const float *signal_feature);
+    float _ScoreFeaturesWeighted(const float *tmpl_feature, const float *signal_feature, const float *weights);
     
     size_t _features; // number of features in each step of the template
     size_t _length; // number of feature vectors in the template
     
     ManagedMemory<float> _tmpl; // size = _features * _length
+    ManagedMemory<float> _weight; // size = _features * _length
     ManagedMemory<float> _alpha; // size = _length
     
+    bool _use_weights = false; // use weights
     float _normalize; // normalization that allows comparing across DynamicTimeMatcher instances
     
     ManagedMemory<float> _dpp_score;
