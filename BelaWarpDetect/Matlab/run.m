@@ -32,47 +32,61 @@ ax2 = subplot(2, 1, 2); plot(len);
 linkaxes([ax2 ax1], 'x');
 
 %% setup
-pth = '~/Documents/School/BU/Gardner Lab/Syllable Match/';
+%pth = '~/Documents/School/BU/Gardner Lab/Syllable Match/';
+pth = '/Volumes/Lab/Gardner Lab/Bela/lbr3009files/';
 fl = 'lbr3009_annotation.mat';
 
 load(fullfile(pth, fl));
 
-%% first pass: load syllables
+%% list of syllables
+segType = cellfun(@(x) x.segType, elements, 'UniformOutput', false);
+segType = sort(unique(cat(1, segType{:})));
+segType = segType(:)';
 
-syllables = {};
-
-total = 0;
-
-for i = 1:length(keys)
-    if ~exist(fullfile(pth, keys{i}), 'file')
-        continue;
-    end
+%% first pass: load audio to make template
+syllables = segType;
+templates = cell(1, max(syllables));
+for syllable = syllables
+    audio = {};
     
-    % load audio
-    [y, fs] = audioread(fullfile(pth, keys{i}));
-    
-    % unique segments
-    for j = 1:length(elements{i}.segType)
-        s = elements{i}.segType(j);
-        if s < 1
+    % for each file
+    for i = 1:length(keys)
+        if ~exist(fullfile(pth, keys{i}), 'file')
             continue;
         end
-        if s > length(syllables) || isempty(syllables{s})
+
+        % get all copies 
+        idx = find(elements{i}.segType == syllable);
+        if isempty(idx)
+            continue;
+        end
+
+        % load audio
+        [y, fs] = audioread(fullfile(pth, keys{i}));
+
+        % unique segments
+        for j = idx'
             strt = round(elements{i}.segFileStartTimes(j) * fs);
             stop = round(elements{i}.segFileEndTimes(j) * fs);
-            syllables{s} = y(strt:stop);
+            if (stop - strt) < 512
+                continue;
+            end
+            audio{end + 1} = y(strt:stop);
         end
     end
     
-    % total
-    total = total + length(elements{i}.segType);
+    if length(audio) >= 5
+        [tmpl, weights] = build_template(audio, fs);
+        templates{syllable} = tmpl;
+    end
 end
 
-%% second pass: score syllables
+%% second pass: score templates
+%compile_mex;
 
-scores = nan(total, length(syllables));
-lengths = nan(total, length(syllables));
-actual = zeros(total, 1);
+scores = nan(0, length(templates));
+lengths = nan(0, length(templates));
+actual = zeros(0, 1);
 
 idx = 0;
 for i = 1:length(keys)
@@ -100,12 +114,12 @@ for i = 1:length(keys)
     end
     
     % evaluate each
-    for j = 1:length(syllables)
-        if isempty(syllables{j})
+    for j = 1:length(templates)
+        if isempty(templates{j})
             continue;
         end
         
-        [cur_scores, cur_lengths] = eval_syllable(syllables{j}, fs, to_evaluate{:});
+        [cur_scores, cur_lengths] = eval_syllable(templates{j}, fs, to_evaluate{:});
         
         scores((idx + 1):(idx + length(to_evaluate)), j) = cur_scores;
         lengths((idx + 1):(idx + length(to_evaluate)), j) = cur_lengths;
@@ -115,10 +129,24 @@ for i = 1:length(keys)
     idx = idx + length(to_evaluate);
 end
 
-%% confusion matrix
+% confusion matrix
 [~, predicted] = max(scores, [], 2);
-confusion = accumarray([actual(actual > 0) predicted(actual > 0)], 1, [length(syllables) length(syllables)]);
+confusion = accumarray([actual(actual > 0)' predicted(actual > 0)], 1, [length(templates) length(templates)]);
 fprintf('Accuracy: %.2f%%\n', 100 * sum(diag(confusion)) ./ sum(confusion(:)));
+
+known = ~cellfun(@isempty, templates);
+fprintf('Accuracy: %.2f%%\n', 100 * sum(diag(confusion(known, known))) ./ sum(sum(confusion(known, known))));
+
+%% confusion matrix
+figure;
+imagesc(bsxfun(@rdivide, confusion, sum(confusion, 2)));
+axis square;
+title('Confusion matrix');
+
+figure;
+imagesc(bsxfun(@rdivide, confusion(known, known), sum(confusion(known, known), 2)));
+axis square;
+title('Known confusion matrix');
 
 %% plot roc
 for i = 1:length(syllables)
@@ -135,14 +163,37 @@ for i = 1:length(syllables)
     title(sprintf('Syllable %d; N = %d', i, sum(correct)));
 end
 
+%% softmax like scores
+scores_norm = bsxfun(@rdivide, exp(scores), nansum(exp(scores), 2));
+for i = 1:length(templates)
+    if isempty(templates{i})
+        continue;
+    end
+    
+    % calculate correct
+    correct = actual == i;
+    
+    % plot ROC
+    figure;
+    plotroc(1 * correct, scores_norm(:, i)');
+    title(sprintf('Syllable %d; N = %d', i, sum(correct)));
+end
+
 %% visualize
-for i = [2 20]
+for i = [2 7]
     if isempty(syllables{i})
         continue;
     end
     
-    [s, f, t] = spectrogram(syllables{i}, 512, 512-40, 512, fs);
-    f_idx = f > 500 & f < 10000;
+    if numel(syllables{i}) == length(syllables{i})
+        [s, f, t] = spectrogram(syllables{i}, 512, 512-40, 512, fs);
+        f_idx = f > 500 & f < 10000;
+    else
+        s = syllables{i};
+        f = size(s, 1):-1:1;
+        f_idx = f > 0;
+        t = 1:size(s, 2);
+    end
 
     figure;
     imagesc(t, f(f_idx), log(1 + abs(s(f_idx, :))));

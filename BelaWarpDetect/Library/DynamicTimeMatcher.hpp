@@ -23,7 +23,8 @@ struct dtm_out {
 class DynamicTimeMatcher
 {
 public:
-    DynamicTimeMatcher(const std::vector<std::vector<float>> &templ);
+    DynamicTimeMatcher(const std::vector<const std::vector<float>> &templ);
+    DynamicTimeMatcher(const float *templ, size_t length, size_t features);
     ~DynamicTimeMatcher();
     
     bool SetAlpha(float alpha);

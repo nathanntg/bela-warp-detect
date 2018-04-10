@@ -25,7 +25,20 @@ struct ms_dtm {
     float last_score;
     int last_len;
     
-    ms_dtm(size_t index_, const std::vector<std::vector<float>> &tmpl, float threshold_, float threshold_length_) : index(index_), dtm(tmpl), threshold(threshold_), threshold_length(threshold_length_), last_score(0.f), last_len(0) {
+    ms_dtm(size_t index_, const std::vector<const std::vector<float>> &tmpl, float threshold_, float threshold_length_) : index(index_), dtm(tmpl), threshold(threshold_), threshold_length(threshold_length_), last_score(0.f), last_len(0) {
+        float a;
+        size_t dtm_length = dtm.GetLength();
+        std::vector<float> alpha(dtm_length);
+        for (size_t i = 0, maxi = (dtm_length / 2) + 1; i < maxi; ++i) {
+            a = 2.f + 1.f * pow(0.9f, static_cast<float>(i));
+            alpha[i] = a;
+            alpha[dtm_length - 1 - i] = a;
+        }
+        
+        dtm.SetAlpha(alpha);
+    }
+    
+    ms_dtm(size_t index_, const float *tmpl, size_t length, size_t features, float threshold_, float threshold_length_) : index(index_), dtm(tmpl, length, features), threshold(threshold_), threshold_length(threshold_length_), last_score(0.f), last_len(0) {
         float a;
         size_t dtm_length = dtm.GetLength();
         std::vector<float> alpha(dtm_length);
@@ -46,8 +59,12 @@ public:
     ~MatchSyllables();
     
     // returns a syllable ID, used when identifying
-    int AddSyllable(const std::vector<float> &audio, float threshold, float constrain_length = 0.07f);
-    int AddSyllable(const std::string file, float threshold, float constrain_length = 0.07f);
+    int AddSyllable(const std::vector<float> &audio, float threshold, float constrain_length = 0.25f);
+    int AddSyllable(const std::string file, float threshold, float constrain_length = 0.25f);
+    
+    int AddSpectrogram(const std::vector<const std::vector<float>> &spect, float threshold, float constrain_length = 0.25f);
+    int AddSpectrogram(const float *spect, size_t length, size_t features, float threshold, float constrain_length = 0.25f);
+    int AddSpectrogram(const std::string file, float threshold, float constrain_length = 0.25f);
     
     void SetCallbackMatch(void (*cb)(size_t, float, int));
     void SetCallbackColumn(void (*cb)(std::vector<float>, std::vector<int>)); // for debugging purposes, called once per syllable per column

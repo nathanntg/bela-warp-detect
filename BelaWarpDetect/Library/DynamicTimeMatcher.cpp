@@ -12,7 +12,7 @@
 #include <cmath>
 #include <stdexcept>
 
-DynamicTimeMatcher::DynamicTimeMatcher(const std::vector<std::vector<float>> &templ) :
+DynamicTimeMatcher::DynamicTimeMatcher(const std::vector<const std::vector<float>> &templ) :
 _length(templ.size()),
 _features(templ[0].size()),
 _tmpl(_features * _length),
@@ -36,6 +36,27 @@ _dpp_len(2 * (_length + 1)) {
         // copy template features
         memcpy(_tmpl.ptr() + (i * _features), &templ[i][0], sizeof(float) * _features);
     }
+    
+    // calculate normalization
+    _CalculateNormalize();
+    
+    // allocate alpha
+    SetAlpha(1.0);
+    
+    // reset dpp storage
+    Reset();
+}
+
+DynamicTimeMatcher::DynamicTimeMatcher(const float *templ, size_t length, size_t features) :
+_length(length),
+_features(features),
+_tmpl(_features * _length),
+_alpha(_length),
+_normalize(0),
+_dpp_score(2 * (_length + 1)),
+_dpp_len(2 * (_length + 1)) {
+    // copy template features
+    memcpy(_tmpl.ptr(), templ, sizeof(float) * length * features);
     
     // calculate normalization
     _CalculateNormalize();

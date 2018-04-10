@@ -12,6 +12,7 @@
 #include <vector>
 #include <mex.h>
 
+#include "Library/ManagedMemory.hpp"
 #include "Library/MatchSyllables.hpp"
 
 #define MX_TEST(TEST, ERR_ID, ERR_STR) if (!(TEST)) { mexErrMsgIdAndTxt(ERR_ID, ERR_STR); }
@@ -109,6 +110,25 @@ template <typename T> void getVector(const mxArray *in, std::vector<T> &vec, con
     }
 }
 
+static bool testMatrix(const mxArray *in) {
+    // type
+    if (!mxIsDouble(in) && !mxIsSingle(in)) {
+        return false;
+    }
+    
+    // real
+    if (mxIsComplex(in)) {
+        return false;
+    }
+    
+    // dimensions
+    if (mxGetNumberOfDimensions(in) != 2) {
+        return false;
+    }
+    
+    return true;
+}
+
 /* the gateway function */
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     float sampling_rate;
@@ -119,15 +139,48 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     MX_TEST(nlhs == 2, "MATLAB:es:invalidNumOutputs", "Requires two outputs (scores and lengths).");
     
     /* read arguments */
-    getVector(prhs[0], syllable, "MATLAB:es:invalidInput", "The syllable must be a real vector.");
     sampling_rate = static_cast<float>(getScalar(prhs[1], "MATLAB:es:invalidInput", "The sampling rate must be a real scalar."));
     
     /* create matcher */
     MatchSyllables ms(sampling_rate);
     
     /* add syllable */
-    if (ms.AddSyllable(syllable, 1e6) == -1) {
-        mexErrMsgIdAndTxt("MATLAB:es:internalError", "Unable to add the syllable to the matcher.");
+    if (testVector(prhs[0])) {
+        getVector(prhs[0], syllable, "MATLAB:es:invalidInput", "The syllable must be a real vector or matrix.");
+        if (ms.AddSyllable(syllable, 1e6) == -1) {
+            mexErrMsgIdAndTxt("MATLAB:es:internalError", "Unable to add the syllable to the matcher.");
+        }
+    }
+    else if (testMatrix(prhs[0])) {
+        size_t sn, sm, sl;
+        sm = mxGetM(prhs[0]);
+        sn = mxGetN(prhs[0]);
+        sl = sn * sm;
+        ManagedMemory<float> mat(sn * sm);
+        
+        // fill matrix
+        if (mxIsDouble(prhs[0])) {
+            double *values = static_cast<double *>(mxGetPr(prhs[0]));
+            for (size_t i = 0; i < sl; ++i) {
+                mat[i] = static_cast<float>(values[i]);
+            }
+        }
+        else if (mxIsSingle(prhs[0])) {
+            float *values = reinterpret_cast<float *>(mxGetPr(prhs[0]));
+            for (size_t i = 0; i < sl; ++i) {
+                mat[i] = values[i];
+            }
+        }
+        else {
+            mexErrMsgIdAndTxt("MATLAB:es:invalidInput", "The syllable must be a real vector or matrix.");
+        }
+        
+        if (ms.AddSpectrogram(mat.ptr(), sn, sm, 1e6) == -1) {
+            mexErrMsgIdAndTxt("MATLAB:es:internalError", "Unable to add the syllable to the matcher.");
+        }
+    }
+    else {
+        mexErrMsgIdAndTxt("MATLAB:es:invalidInput", "The syllable must be a real vector or matrix.");
     }
     
     /* initialize */

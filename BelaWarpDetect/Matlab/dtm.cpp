@@ -139,7 +139,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     /* generate template */
     stft.WriteValues(templ);
     std::vector<float> col;
-    std::vector<std::vector<float>> features_templ;
+    std::vector<const std::vector<float>> features_templ;
     for (unsigned int i = 0; i < len_templ; ++i) {
         if (!stft.ReadPower(col)) {
             mexErrMsgIdAndTxt("MATLAB:dtm:internalError", "Unable to generate expected number of spectral columns for the template.");
