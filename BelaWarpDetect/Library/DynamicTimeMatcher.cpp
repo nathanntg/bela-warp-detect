@@ -10,11 +10,13 @@
 
 #include <limits>
 #include <cmath>
+#include <cstring> // memcpy
 #include <stdexcept>
+#include <math.h> // isnan
 
-DynamicTimeMatcher::DynamicTimeMatcher(const std::vector<const std::vector<float>> &templ) :
-_length(templ.size()),
+DynamicTimeMatcher::DynamicTimeMatcher(const std::vector<std::vector<float>> &templ) :
 _features(templ[0].size()),
+_length(templ.size()),
 _tmpl(_features * _length),
 _alpha(_length),
 _normalize(0),
@@ -48,8 +50,8 @@ _dpp_len(2 * (_length + 1)) {
 }
 
 DynamicTimeMatcher::DynamicTimeMatcher(const float *templ, size_t length, size_t features) :
-_length(length),
 _features(features),
+_length(length),
 _tmpl(_features * _length),
 _alpha(_length),
 _normalize(0),

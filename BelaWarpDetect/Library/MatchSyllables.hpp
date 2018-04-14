@@ -25,7 +25,7 @@ struct ms_dtm {
     float last_score;
     int last_len;
     
-    ms_dtm(size_t index_, const std::vector<const std::vector<float>> &tmpl, float threshold_, float threshold_length_) : index(index_), dtm(tmpl), threshold(threshold_), threshold_length(threshold_length_), last_score(0.f), last_len(0) {
+    ms_dtm(size_t index_, const std::vector<std::vector<float>> &tmpl, float threshold_, float threshold_length_) : index(index_), dtm(tmpl), threshold(threshold_), threshold_length(threshold_length_), last_score(0.f), last_len(0) {
         float a;
         size_t dtm_length = dtm.GetLength();
         std::vector<float> alpha(dtm_length);
@@ -62,7 +62,7 @@ public:
     int AddSyllable(const std::vector<float> &audio, float threshold, float constrain_length = 0.25f);
     int AddSyllable(const std::string file, float threshold, float constrain_length = 0.25f);
     
-    int AddSpectrogram(const std::vector<const std::vector<float>> &spect, float threshold, float constrain_length = 0.25f);
+    int AddSpectrogram(const std::vector<std::vector<float>> &spect, float threshold, float constrain_length = 0.25f);
     int AddSpectrogram(const float *spect, size_t length, size_t features, float threshold, float constrain_length = 0.25f);
     int AddSpectrogram(const std::string file, float threshold, float constrain_length = 0.25f);
     
@@ -76,8 +76,12 @@ public:
     void Reset();
     
     // ingest new audio
-    bool IngestAudio(const float *audio, const unsigned int len);
+    bool IngestAudio(const float *audio, const unsigned int len, const unsigned int stride=1);
     bool IngestAudio(const std::vector<float>& audio);
+    
+    // perform matching
+    bool MatchOnce(float *score, int *len);
+    void PerformMatching();
     
     // debugging option
     bool ZeroPadAndFetch(std::vector<float> &scores, std::vector<int> &lengths);
@@ -85,7 +89,6 @@ public:
 private:
     // perform matching
     bool _ReadFeatures(std::vector<float> &power);
-    void _PerformMatching();
     
     bool _initialized = false;
     

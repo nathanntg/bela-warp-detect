@@ -18,8 +18,8 @@ _window_stride(window_stride),
 _fft_size(static_cast<fft_length_t>(ceil(log2(window_length)))),
 _fft_length(1 << _fft_size),
 _fft_length_half(_fft_length / 2),
-_buffer(buffer_size),
 _window(_window_length),
+_buffer(buffer_size),
 _samples_windowed(_fft_length) {
     // initialize window to 1s
     for (unsigned int i = 0; i < _window_length; ++i) {
@@ -183,15 +183,15 @@ bool CircularShortTermFourierTransform::WriteValues(const std::vector<fft_value_
     return true;
 }
 
-bool CircularShortTermFourierTransform::WriteValues(const fft_value_t *values, const unsigned int len) {
+bool CircularShortTermFourierTransform::WriteValues(const fft_value_t *values, const unsigned int len, const unsigned int stride) {
     // check for sufficient space
     if (len > GetLengthCapacity()) {
         return false;
     }
     
     // TODO: rewrite to use copy
-    for (unsigned int i = 0; i < len; ++i) {
-        _buffer[_ptr_write] = values[i];
+    for (unsigned int i = 0, maxi = len * stride; i < maxi; i += stride) {
+        _buffer[_ptr_write] = values[i * stride];
         _ptr_write = (_ptr_write + 1) % _buffer_size;
     }
     
@@ -233,7 +233,7 @@ bool CircularShortTermFourierTransform::ReadPower(fft_value_t *power) {
     vDSP_vsmul(power, 1, &c_two, power, 1, _fft_length_half + 1);
 #else
     // claculate FFT
-    ne10_fft_r2c_1d_float32_neon(_fft_output, _samples_windowed, _fft_config);
+    ne10_fft_r2c_1d_float32_neon(_fft_output, _samples_windowed.ptr(), _fft_config);
     
     for (unsigned int i = 0; i < _fft_length_half + 1; ++i) {
         power[i] = sqrt(pow(_fft_output[i].r, 2.) + pow(_fft_output[i].i, 2.));

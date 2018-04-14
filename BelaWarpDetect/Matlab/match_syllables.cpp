@@ -11,101 +11,7 @@
 #include <mex.h>
 
 #include "Library/MatchSyllables.hpp"
-
-#define MX_TEST(TEST, ERR_ID, ERR_STR) if (!(TEST)) { mexErrMsgIdAndTxt(ERR_ID, ERR_STR); }
-
-static bool testScalar(const mxArray *in) {
-    // type
-    if (!mxIsDouble(in) && !mxIsSingle(in)) {
-        return false;
-    }
-    
-    // real
-    if (mxIsComplex(in)) {
-        return false;
-    }
-    
-    // dimensions
-    if (mxGetNumberOfDimensions(in) != 2 || mxGetM(in) != 1 || mxGetN(in) != 1) {
-        return false;
-    }
-    
-    return true;
-}
-
-static double getScalar(const mxArray *in, const char *err_id, const char *err_str) {
-    /* check scalar */
-    if (!testScalar(in)) {
-        mexErrMsgIdAndTxt(err_id, err_str);
-    }
-    
-    /* get the scalar input */
-    return mxGetScalar(in);
-}
-
-static bool testVector(const mxArray *in) {
-    // type
-    if (!mxIsDouble(in) && !mxIsSingle(in)) {
-        return false;
-    }
-    
-    // real
-    if (mxIsComplex(in)) {
-        return false;
-    }
-    
-    // dimensions
-    if (mxGetNumberOfDimensions(in) != 2) {
-        return false;
-    }
-    
-    // make sure there is at least one singleton dimension
-    if (mxGetM(in) != 1 && mxGetN(in) != 1) {
-        return false;
-    }
-    
-    // make sure there is at least one non-zero dimension
-    if (mxGetM(in) < 2 && mxGetN(in) < 2) {
-        return false;
-    }
-    
-    return true;
-}
-
-template <typename T> void getVector(const mxArray *in, std::vector<T> &vec, const char *err_id, const char *err_str) {
-    // check vector
-    if (!testVector(in)) {
-        mexErrMsgIdAndTxt(err_id, err_str);
-    }
-    
-    // allocate pointer
-    size_t sn, sm, sl;
-    
-    // get dimensions
-    sn = mxGetN(in);
-    sm = mxGetM(in);
-    sl = sn > 1 ? sn : sm;
-    
-    // resize vector
-    vec.resize(sl);
-    
-    if (mxIsDouble(in)) {
-        double *values = static_cast<double *>(mxGetPr(in));
-        
-        // fill vector
-        for (size_t i = 0; i < sl; ++i) {
-            vec[i] = static_cast<T>(values[i]);
-        }
-    }
-    else if (mxIsSingle(in)) {
-        float *values = reinterpret_cast<float *>(mxGetPr(in));
-        
-        // fill vector
-        for (size_t i = 0; i < sl; ++i) {
-            vec[i] = static_cast<T>(values[i]);
-        }
-    }
-}
+#include "Matlab/Matlab.hpp"
 
 std::vector<std::vector<float>> result_score;
 std::vector<std::vector<int>> result_length;
@@ -134,11 +40,27 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     std::vector<float> syllable;
     for (unsigned int i = 2; i < nrhs; ++i) {
-        getVector(prhs[i], syllable, "MATLAB:ms:invalidInput", "Each syllable must be a real vector.");
-        if (ms.AddSyllable(syllable, 1.0) == -1) {
-            mexErrMsgIdAndTxt("MATLAB:ms:invalidInput", "Unable to add syllable.");
+        if (testVector(prhs[i])) {
+            getVector(prhs[i], syllable, "MATLAB:ms:invalidInput", "The syllable must be a real vector or matrix.");
+            if (ms.AddSyllable(syllable, 1e6) == -1) {
+                mexErrMsgIdAndTxt("MATLAB:ms:internalError", "Unable to add the syllable to the matcher.");
+            }
+        }
+        else if (testMatrix(prhs[i])) {
+            size_t sn, sm;
+            ManagedMemory<float> mat(getMatrix<float>(prhs[i], sm, sn, "MATLAB:ms:invalidInput", "The syllable must be a real vector or matrix."));
+            if (ms.AddSpectrogram(mat.ptr(), sn, sm, 1e6) == -1) {
+                mexErrMsgIdAndTxt("MATLAB:ms:internalError", "Unable to add the syllable to the matcher.");
+            }
+        }
+        else {
+            mexErrMsgIdAndTxt("MATLAB:ms:invalidInput", "The syllable must be a real vector or matrix.");
         }
     }
+    
+    // clear outputs
+    result_score.clear();
+    result_length.clear();
     
     ms.SetCallbackColumn(cbAppendResult);
     
@@ -151,9 +73,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     size_t chunk_size = 1024;
     std::vector<float>::iterator begin = signal.begin();
     for (size_t i = 0; i < signal.size(); i += chunk_size) {
+        // ingest audio
         if (!ms.IngestAudio(std::vector<float>(begin + i, begin + (i + chunk_size < signal.size() ? i + chunk_size : signal.size())))) {
             mexErrMsgIdAndTxt("MATLAB:ms:internalError", "Unable to ingest audio.");
         }
+        
+        // perform matching
+        ms.PerformMatching();
     }
     
     // generate outputs
@@ -168,8 +94,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // fill outputs
     for (size_t i = 0; i < rows; ++i) {
         for (size_t j = 0; j < cols; ++j) {
-            scores[i * cols + j] = result_score[i][j];
-            lengths[i * cols + j] = result_length[i][j];
+            scores[i + j * rows] = result_score[i][j];
+            lengths[i + j * rows] = result_length[i][j];
         }
     }
+    
+    // clear outputs
+    result_score.clear();
+    result_length.clear();
 }

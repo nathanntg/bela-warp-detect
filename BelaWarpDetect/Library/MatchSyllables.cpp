@@ -10,6 +10,8 @@
 #include "LoadAudio.hpp"
 #include "ManagedMemory.hpp"
 
+#include <cmath>
+
 MatchSyllables::MatchSyllables(float sample_rate) :
 _sample_rate(sample_rate),
 _stft(_window_length, _window_stride, _buffer_length),
@@ -60,7 +62,7 @@ int MatchSyllables::AddSyllable(const std::vector<float> &audio, float threshold
     _stft.ZeroPadToEdge();
     
     // template for syllable
-    std::vector<const std::vector<float>> tmpl;
+    std::vector<std::vector<float>> tmpl;
     
     // read in template
     std::vector<float> col;
@@ -95,7 +97,7 @@ int MatchSyllables::AddSyllable(const std::string file, float threshold, float c
     return AddSyllable(audio, threshold, constrain_length);
 }
 
-int MatchSyllables::AddSpectrogram(const std::vector<const std::vector<float>> &spect, float threshold, float constrain_length) {
+int MatchSyllables::AddSpectrogram(const std::vector<std::vector<float>> &spect, float threshold, float constrain_length) {
     // invalid feature length
     if ((_idx_hi - _idx_lo) != spect[0].size()) {
         return -1;
@@ -187,18 +189,15 @@ void MatchSyllables::Reset() {
     }
 }
 
-bool MatchSyllables::IngestAudio(const float *audio, const unsigned int len) {
+bool MatchSyllables::IngestAudio(const float *audio, const unsigned int len, const unsigned int stride) {
     if (!_initialized) {
         return false;
     }
     
     // ingest values
-    if (!_stft.WriteValues(audio, len)) {
+    if (!_stft.WriteValues(audio, len, stride)) {
         return false;
     }
-    
-    // match any
-    _PerformMatching();
     
     return true;
 }
@@ -213,52 +212,66 @@ bool MatchSyllables::IngestAudio(const std::vector<float> &audio) {
         return false;
     }
     
-    // match any
-    _PerformMatching();
+    return true;
+}
+
+bool MatchSyllables::MatchOnce(float *score, int *len) {
+    // enough data to read features?
+    if (!_ReadFeatures(_features)) {
+        return false;
+    }
+    
+    for (auto it = _dtms.begin(); it != _dtms.end(); ++it) {
+        struct dtm_out out = it->dtm.IngestFeatureVector(&_features[_idx_lo]);
+        
+        // was last time point below theshold, below length constraint and a local minimum?
+        if (it->last_score >= it->threshold && fabs(static_cast<float>(it->last_len)) < it-> threshold_length && out.normalized_score < it->last_score) {
+            // ALTERNATIVE:
+            //if (out.score >= _dtms[i].threshold && abs((float)out.len_diff) < _dtms[i].length) {
+            //}
+            
+            // call match callback
+            if (_cb_match) {
+                // trigger callback
+                _cb_match(it->index, it->last_score, it->last_len);
+            }
+            
+            // reset DTM? OR reset all?
+            it->dtm.Reset();
+            
+            // zero out score to prevent double trigger
+            out.normalized_score = 0.f;
+        }
+        
+        // populate arguments
+        if (score) {
+            score[it->index] = out.normalized_score;
+        }
+        if (len) {
+            len[it->index] = out.len_diff;
+        }
+        
+        // store last
+        it->last_score = out.normalized_score;
+        it->last_len = out.len_diff;
+    }
+    
+    // call at end of each column
+    if (_cb_column) {
+        std::vector<float> scores = std::vector<float>(_next_index);
+        std::vector<int> lengths = std::vector<int>(_next_index);
+        for (auto it = _dtms.begin(); it != _dtms.end(); ++it) {
+            scores[it->index] = it->last_score;
+            lengths[it->index] = it->last_len;
+        }
+        _cb_column(scores, lengths);
+    }
     
     return true;
 }
 
-void MatchSyllables::_PerformMatching() {
-    while (_ReadFeatures(_features)) {
-        for (auto it = _dtms.begin(); it != _dtms.end(); ++it) {
-            struct dtm_out out = it->dtm.IngestFeatureVector(&_features[_idx_lo]);
-            
-            // was last time point below theshold, below length constraint and a local minimum?
-            if (it->last_score >= it->threshold && abs(static_cast<float>(it->last_len)) < it-> threshold_length && out.normalized_score < it->last_score) {
-                // ALTERNATIVE:
-                //if (out.score >= _dtms[i].threshold && abs((float)out.len_diff) < _dtms[i].length) {
-                //}
-                
-                // call match callback
-                if (_cb_match) {
-                    // trigger callback
-                    _cb_match(it->index, it->last_score, it->last_len);
-                }
-                    
-                // reset DTM? OR reset all?
-                it->dtm.Reset();
-                
-                // zero out score to prevent double trigger
-                out.normalized_score = 0.f;
-            }
-            
-            // store last
-            it->last_score = out.normalized_score;
-            it->last_len = out.len_diff;
-        }
-        
-        // call at end of each column
-        if (_cb_column) {
-            std::vector<float> scores = std::vector<float>(_next_index);
-            std::vector<int> lengths = std::vector<int>(_next_index);
-            for (auto it = _dtms.begin(); it != _dtms.end(); ++it) {
-                scores[it->index] = it->last_score;
-                lengths[it->index] = it->last_len;
-            }
-            _cb_column(scores, lengths);
-        }
-    }
+void MatchSyllables::PerformMatching() {
+    while (MatchOnce(NULL, NULL));
 }
 
 bool MatchSyllables::ZeroPadAndFetch(std::vector<float> &scores, std::vector<int> &lengths) {
@@ -270,7 +283,7 @@ bool MatchSyllables::ZeroPadAndFetch(std::vector<float> &scores, std::vector<int
     _stft.ZeroPadToEdge();
     
     // perform matching
-    _PerformMatching();
+    PerformMatching();
     
     // resize returns
     scores.resize(_next_index);

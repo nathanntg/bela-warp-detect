@@ -61,7 +61,7 @@ public:
     
     // write to the circular buffer
     bool WriteValues(const std::vector<fft_value_t>& values);
-    bool WriteValues(const fft_value_t *values, const unsigned int len);
+    bool WriteValues(const fft_value_t *values, const unsigned int len, const unsigned int stride = 1);
     
     // read power
     bool ReadPower(fft_value_t *power);

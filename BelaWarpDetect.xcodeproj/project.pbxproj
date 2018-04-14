@@ -70,6 +70,7 @@
 		D88DF472200D54740076F5EE /* DynamicTimeMatcher.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DynamicTimeMatcher.hpp; sourceTree = "<group>"; };
 		D898B9B9200EF9CD0090338B /* dtm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dtm.cpp; sourceTree = "<group>"; };
 		D8AACCFB201254EA007A1A93 /* catch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = catch.hpp; sourceTree = "<group>"; };
+		D8BC76B9207CE5E400AF62E5 /* Matlab.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Matlab.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +95,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D82FAF24208238C9001BA74C /* zero */ = {
+			isa = PBXGroup;
+			children = (
+				D85CBA5320098AF300ACD86A /* render.cpp */,
+			);
+			path = zero;
+			sourceTree = "<group>";
+		};
 		D831CB4A2007F2E0008C67E3 = {
 			isa = PBXGroup;
 			children = (
@@ -136,6 +145,7 @@
 		D8AACCF720124421007A1A93 /* Matlab */ = {
 			isa = PBXGroup;
 			children = (
+				D8BC76B9207CE5E400AF62E5 /* Matlab.hpp */,
 				D898B9B9200EF9CD0090338B /* dtm.cpp */,
 				D8849C032013D614009EE2D4 /* match_syllables.cpp */,
 				D8661E352020F4710025B4D7 /* eval_syllable.cpp */,
@@ -162,7 +172,7 @@
 		D8AACCF920125462007A1A93 /* Bela */ = {
 			isa = PBXGroup;
 			children = (
-				D85CBA5320098AF300ACD86A /* render.cpp */,
+				D82FAF24208238C9001BA74C /* zero */,
 			);
 			path = Bela;
 			sourceTree = "<group>";
@@ -222,7 +232,7 @@
 		D831CB4B2007F2E0008C67E3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Nathan Perkins";
 				TargetAttributes = {
 					D831CB522007F2E0008C67E3 = {
@@ -297,6 +307,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -304,6 +315,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -352,6 +364,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -359,6 +372,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

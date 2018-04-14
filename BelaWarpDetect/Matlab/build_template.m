@@ -28,7 +28,7 @@ function [tmpl, weights] = build_template(audio, fs, varargin)
     %% get base template
     audio_len = cellfun(@length, audio);
     [~, idx] = sort(audio_len);
-    tmpl_idx = idx(floor(length(idx) / 2));
+    tmpl_idx = idx(ceil(length(idx) / 2));
 
     %% make spectrograms
     [s, f, t] = to_spectrogram(audio{tmpl_idx}, fs);

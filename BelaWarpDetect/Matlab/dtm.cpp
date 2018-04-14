@@ -12,101 +12,7 @@
 
 #include "Library/CircularShortTimeFourierTransform.hpp"
 #include "Library/DynamicTimeMatcher.hpp"
-
-#define MX_TEST(TEST, ERR_ID, ERR_STR) if (!(TEST)) { mexErrMsgIdAndTxt(ERR_ID, ERR_STR); }
-
-static bool testScalar(const mxArray *in) {
-    // type
-    if (!mxIsDouble(in) && !mxIsSingle(in)) {
-        return false;
-    }
-    
-    // real
-    if (mxIsComplex(in)) {
-        return false;
-    }
-    
-    // dimensions
-    if (mxGetNumberOfDimensions(in) != 2 || mxGetM(in) != 1 || mxGetN(in) != 1) {
-        return false;
-    }
-    
-    return true;
-}
-
-static double getScalar(const mxArray *in, const char *err_id, const char *err_str) {
-    /* check scalar */
-    if (!testScalar(in)) {
-        mexErrMsgIdAndTxt(err_id, err_str);
-    }
-    
-    /* get the scalar input */
-    return mxGetScalar(in);
-}
-
-static bool testVector(const mxArray *in) {
-    // type
-    if (!mxIsDouble(in) && !mxIsSingle(in)) {
-        return false;
-    }
-    
-    // real
-    if (mxIsComplex(in)) {
-        return false;
-    }
-    
-    // dimensions
-    if (mxGetNumberOfDimensions(in) != 2) {
-        return false;
-    }
-    
-    // make sure there is at least one singleton dimension
-    if (mxGetM(in) != 1 && mxGetN(in) != 1) {
-        return false;
-    }
-    
-    // make sure there is at least one non-zero dimension
-    if (mxGetM(in) < 2 && mxGetN(in) < 2) {
-        return false;
-    }
-    
-    return true;
-}
-
-template <typename T> void getVector(const mxArray *in, std::vector<T> &vec, const char *err_id, const char *err_str) {
-    // check vector
-    if (!testVector(in)) {
-        mexErrMsgIdAndTxt(err_id, err_str);
-    }
-    
-    // allocate pointer
-    size_t sn, sm, sl;
-    
-    // get dimensions
-    sn = mxGetN(in);
-    sm = mxGetM(in);
-    sl = sn > 1 ? sn : sm;
-    
-    // resize vector
-    vec.resize(sl);
-    
-    if (mxIsDouble(in)) {
-        double *values = static_cast<double *>(mxGetPr(in));
-        
-        // fill vector
-        for (size_t i = 0; i < sl; ++i) {
-            vec[i] = static_cast<T>(values[i]);
-        }
-    }
-    else if (mxIsSingle(in)) {
-        float *values = reinterpret_cast<float *>(mxGetPr(in));
-        
-        // fill vector
-        for (size_t i = 0; i < sl; ++i) {
-            vec[i] = static_cast<T>(values[i]);
-        }
-    }
-}
+#include "Matlab/Matlab.hpp"
 
 /* the gateway function */
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
@@ -139,7 +45,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     /* generate template */
     stft.WriteValues(templ);
     std::vector<float> col;
-    std::vector<const std::vector<float>> features_templ;
+    std::vector<std::vector<float>> features_templ;
     for (unsigned int i = 0; i < len_templ; ++i) {
         if (!stft.ReadPower(col)) {
             mexErrMsgIdAndTxt("MATLAB:dtm:internalError", "Unable to generate expected number of spectral columns for the template.");
