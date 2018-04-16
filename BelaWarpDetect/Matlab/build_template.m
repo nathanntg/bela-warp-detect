@@ -7,10 +7,10 @@ function [tmpl, weights] = build_template(audio, fs, varargin)
     
     figures = false;
     alpha = [];
-    window_length = 512; % samples
-    window_stride = 40; % samples
-    freq_range = [1e3 1e4];
-    log_power = true;
+    window_length = 256; % samples
+    window_stride = 60; % samples
+    freq_range = [850 9000];
+    log_power = false;
 
     % load custom parameters
     nparams = length(varargin);

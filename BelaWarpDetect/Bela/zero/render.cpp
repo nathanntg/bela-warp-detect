@@ -33,7 +33,7 @@ bool setup(BelaContext *context, void *userData)
     gMatcher = new MatchSyllables(context->audioSampleRate);
     
     // load syllable
-    if (-1 == gMatcher->AddSpectrogram("syllable1.bin", 1)) {
+    if (-1 == gMatcher->AddSpectrogram("syllable01.bin", 1)) {
         rt_printf("Unable to load syllable file.\n");
         return false;
     }
@@ -65,7 +65,7 @@ void process_match_background(void *)
     float scores[1];
     int lens[1];
     while (gMatcher->MatchOnce(&scores[0], &lens[0])) {
-        if (scores[0] > 0.587815 && lens[0] > -14 && lens[0] < 14) {
+        if (scores[0] > 0.372151 && lens[0] > -14 && lens[0] < 14) {
             gLogFile.log(scores[0]);
             gOutput = true;
         }

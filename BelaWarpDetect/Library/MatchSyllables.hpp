@@ -101,10 +101,10 @@ private:
     // parameters
     const unsigned int _buffer_length = 2097152;
     const unsigned int _window_length = 512;
-    const unsigned int _window_stride = 40;
-    const float _freq_lo = 1000.0f;
-    const float _freq_hi = 10000.0f;
-    const bool _log_power = true;
+    const unsigned int _window_stride = 60;
+    const float _freq_lo = 850.0f;
+    const float _freq_hi = 9000.0f;
+    const bool _log_power = false;
     
     // circular short term fourier transform
     CircularShortTermFourierTransform _stft;

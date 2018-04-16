@@ -191,7 +191,7 @@ bool CircularShortTermFourierTransform::WriteValues(const fft_value_t *values, c
     
     // TODO: rewrite to use copy
     for (unsigned int i = 0, maxi = len * stride; i < maxi; i += stride) {
-        _buffer[_ptr_write] = values[i * stride];
+        _buffer[_ptr_write] = values[i];
         _ptr_write = (_ptr_write + 1) % _buffer_size;
     }
     

@@ -110,15 +110,7 @@ void DynamicTimeMatcher::Reset() {
 }
 
 void DynamicTimeMatcher::_CalculateNormalize() {
-    _normalize = 0.f;
-    
-    // compare with zeros
-    // ALTERNATIVE IDEA: compare to scaled version of self
-    ManagedMemory<float> zeros(_features);
-    
-    for (size_t i = 0; i < _length; ++i) {
-        _normalize += _ScoreFeatures(_tmpl.ptr() + (i * _features), zeros.ptr());
-    }
+    _normalize = 0.5 * static_cast<float>(_length);
 }
 
 float DynamicTimeMatcher::_NormalizeScore(float score) {
@@ -133,14 +125,24 @@ float DynamicTimeMatcher::_NormalizeScore(float score) {
 }
 
 float DynamicTimeMatcher::_ScoreFeatures(const float *tmpl_feature, const float *signal_feature) {
-    float result = 0;
+    float dot = 0;
+    float norm_t = 0;
+    float norm_s = 0;
+    
     float tt, ss;
     for (unsigned int i = 0; i < _features; ++i) {
+        // get current entries
         tt = tmpl_feature[i];
         ss = signal_feature[i];
-        result += ((ss - tt) * (ss - tt));
+        
+        // update counts
+        dot += tt * ss;
+        norm_t += tt * tt;
+        norm_s += ss * ss;
     }
-    return sqrt(result);
+    
+    float result = dot / (sqrt(norm_t) * sqrt(norm_s));
+    return 1.f - result;
 }
 
 struct dtm_out DynamicTimeMatcher::IngestFeatureVector(const float *features) {

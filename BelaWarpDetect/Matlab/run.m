@@ -4,6 +4,11 @@ fl = 'llb3_annotation_ordered.mat';
 
 load(fullfile(pth, fl));
 
+% if you change these constants, you must also change the C++ defaults
+window_length = 512;
+window_stride = 60;
+log_power = false;
+
 %% list of syllables
 segType = cellfun(@(x) x.segType, elements, 'UniformOutput', false);
 segType = sort(unique(cat(1, segType{:})));
@@ -34,7 +39,7 @@ for syllable = syllables
         for j = idx'
             strt = floor(elements{i}.segFileStartTimes(j) * fs);
             stop = ceil(elements{i}.segFileEndTimes(j) * fs);
-            if (stop - strt) < 512
+            if (stop - strt) < (window_length / 2)
                 continue;
             end
             
@@ -47,12 +52,12 @@ for syllable = syllables
     end
     
     if length(audio) >= 5
-        [tmpl, weights] = build_template(audio, fs);
+        [tmpl, weights] = build_template(audio, fs, 'window_length', window_length, 'window_stride', window_stride, 'log_power', log_power);
         templates{syllable} = tmpl;
     end
     
     if syllable == 1
-        build_template(audio, fs, 'figures', true);
+        build_template(audio, fs, 'figures', true, 'window_length', window_length, 'window_stride', window_stride, 'log_power', log_power);
     end
 end
 
@@ -161,7 +166,7 @@ for i = [2 7]
     end
     
     if numel(syllables{i}) == length(syllables{i})
-        [s, f, t] = spectrogram(syllables{i}, 512, 512-40, 512, fs);
+        [s, f, t] = spectrogram(syllables{i}, window_length, window_length - window_stride, window_length, fs);
         f_idx = f > 500 & f < 10000;
     else
         s = syllables{i};
@@ -205,7 +210,7 @@ for i = 1:length(keys)
     
     % score
     [scores, len] = match_syllables(y, fs, ne_templates{:});
-    tms = (512 + 40 * (0:(size(scores, 1) - 1))) ./ fs;
+    tms = (window_length + window_stride * (0:(size(scores, 1) - 1))) ./ fs;
     
     % process scores
     scores_norm = bsxfun(@rdivide, scores .^ 2, sum(scores, 2) + eps);
@@ -228,7 +233,7 @@ for i = 1:length(keys)
         figure;
 
         ax1 = subplot(3, 1, 1);
-        [s, f, t] = spectrogram(y, 512, 512-40, 512, fs);
+        [s, f, t] = spectrogram(y, window_length, window_length - window_stride, window_length, fs);
         f_idx = f > 500 & f < 10000;
         imagesc(t, f(f_idx), log(1 + abs(s(f_idx, :))));
         clrs = bone(256);
@@ -317,7 +322,7 @@ end
 
 %% show results
 syllable = 1;
-threshold = 0.200151;
+threshold = 0.467232;
 
 for i = 1:length(keys)
     if ~exist(fullfile(pth, keys{i}), 'file')
@@ -333,7 +338,7 @@ for i = 1:length(keys)
     
     % score
     [scores, len] = match_syllables(y, fs, templates{syllable});
-    tms = (512 + 40 * (0:(size(scores, 1) - 1))) ./ fs;
+    tms = (window_length + window_stride * (0:(size(scores, 1) - 1))) ./ fs;
     
     % process scores
     scores_mask = scores;
@@ -350,7 +355,7 @@ for i = 1:length(keys)
     figure;
 
     ax1 = subplot(3, 1, 1);
-    [s, f, t] = spectrogram(y, 512, 512-40, 512, fs);
+    [s, f, t] = spectrogram(y, window_length, window_length - window_stride, window_length, fs);
     f_idx = f > 500 & f < 10000;
     imagesc(t, f(f_idx), log(1 + abs(s(f_idx, :))));
     clrs = bone(256);
