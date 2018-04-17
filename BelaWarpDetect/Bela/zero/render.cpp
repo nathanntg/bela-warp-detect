@@ -89,6 +89,25 @@ void render(BelaContext *context, void *userData)
     }
     
     // output
+    
+    // zero outputs
+    for (unsigned int i = 0; i < numAudioFrames * numAudioOutChannels; ++i) {
+        context->audioOut[i] = 0.0;
+    }
+    
+    // WHITE NOISE (test, constant white noise on right channel)
+    // for (unsigned int i = 0; i < numAudioFrames; ++i) {
+    //     if (context->flags & BELA_FLAG_INTERLEAVED) {
+    //         context->audioOut[i * numAudioOutChannels] = 0.0;
+    //         context->audioOut[i * numAudioOutChannels + 1] = 0.4f * ( rand() / (float)RAND_MAX * 2.f - 1.f);
+    //     }
+    //     else {
+    //         context->audioOut[i] = 0.0;
+    //         context->audioOut[i + numAudioFrames] = 0.4f * ( rand() / (float)RAND_MAX * 2.f - 1.f);
+    //     }
+    // }
+    
+    // add TTL pulse
     if (gOutput) {
         for (unsigned int i = 0; i < 44; ++i) {
             if (context->flags & BELA_FLAG_INTERLEAVED) {
