@@ -13,16 +13,20 @@
 		D855A900201255E300BF97FD /* CircularShortTimeFourierTransform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */; };
 		D855A901201255E500BF97FD /* DynamicTimeMatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88DF471200D54740076F5EE /* DynamicTimeMatcher.cpp */; };
 		D855A902201258D700BF97FD /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D884B7C120092CD4005CFC9D /* Accelerate.framework */; };
-		D855A905201279C100BF97FD /* LoadAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D855A903201279C100BF97FD /* LoadAudio.cpp */; };
-		D855A906201279C100BF97FD /* LoadAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D855A903201279C100BF97FD /* LoadAudio.cpp */; };
-		D855A92E20128E0800BF97FD /* libsndfile.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D855A92D20128E0800BF97FD /* libsndfile.1.dylib */; };
-		D855A92F20128E1800BF97FD /* libsndfile.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D855A92D20128E0800BF97FD /* libsndfile.1.dylib */; };
 		D855A9312012912200BF97FD /* TestLoadAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D855A9302012912200BF97FD /* TestLoadAudio.cpp */; };
+		D86F7A6E209211E5004F3C7E /* TPCircularBuffer+AudioBufferList.c in Sources */ = {isa = PBXBuildFile; fileRef = D86F7A69209211E5004F3C7E /* TPCircularBuffer+AudioBufferList.c */; };
+		D86F7A6F209211E5004F3C7E /* TPCircularBuffer+AudioBufferList.c in Sources */ = {isa = PBXBuildFile; fileRef = D86F7A69209211E5004F3C7E /* TPCircularBuffer+AudioBufferList.c */; };
+		D86F7A70209211E5004F3C7E /* TPCircularBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = D86F7A6C209211E5004F3C7E /* TPCircularBuffer.c */; };
+		D86F7A71209211E5004F3C7E /* TPCircularBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = D86F7A6C209211E5004F3C7E /* TPCircularBuffer.c */; };
 		D8807BB82017CC0C0091942D /* TestManagedMemory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8807BB62017CC0C0091942D /* TestManagedMemory.cpp */; };
 		D8849C0120139520009EE2D4 /* MatchSyllables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8849BFF20139520009EE2D4 /* MatchSyllables.cpp */; };
 		D884B7BF20080529005CFC9D /* CircularShortTimeFourierTransform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D884B7BD20080529005CFC9D /* CircularShortTimeFourierTransform.cpp */; };
 		D884B7C220092CD4005CFC9D /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D884B7C120092CD4005CFC9D /* Accelerate.framework */; };
 		D88DF473200D54740076F5EE /* DynamicTimeMatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88DF471200D54740076F5EE /* DynamicTimeMatcher.cpp */; };
+		D8A3F6372090D68600F1311D /* LoadAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D855A903201279C100BF97FD /* LoadAudio.cpp */; };
+		D8A3F6382090D68600F1311D /* LoadAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D855A903201279C100BF97FD /* LoadAudio.cpp */; };
+		D8A3F63D2090D77B00F1311D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8A3F63C2090D77B00F1311D /* AudioToolbox.framework */; };
+		D8A3F63E2090EC8700F1311D /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8A3F6392090D6E500F1311D /* CoreAudio.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -58,6 +62,12 @@
 		D855A9302012912200BF97FD /* TestLoadAudio.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TestLoadAudio.cpp; sourceTree = "<group>"; };
 		D85CBA5320098AF300ACD86A /* render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = render.cpp; sourceTree = "<group>"; };
 		D8661E352020F4710025B4D7 /* eval_syllable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = eval_syllable.cpp; sourceTree = "<group>"; };
+		D86F7A68209211E5004F3C7E /* TPCircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TPCircularBuffer.h; sourceTree = "<group>"; };
+		D86F7A69209211E5004F3C7E /* TPCircularBuffer+AudioBufferList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "TPCircularBuffer+AudioBufferList.c"; sourceTree = "<group>"; };
+		D86F7A6A209211E5004F3C7E /* TPCircularBuffer.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TPCircularBuffer.podspec; sourceTree = "<group>"; };
+		D86F7A6B209211E5004F3C7E /* README.markdown */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.markdown; sourceTree = "<group>"; };
+		D86F7A6C209211E5004F3C7E /* TPCircularBuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = TPCircularBuffer.c; sourceTree = "<group>"; };
+		D86F7A6D209211E5004F3C7E /* TPCircularBuffer+AudioBufferList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TPCircularBuffer+AudioBufferList.h"; sourceTree = "<group>"; };
 		D8807BB32017C8230091942D /* ManagedMemory.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ManagedMemory.hpp; sourceTree = "<group>"; };
 		D8807BB62017CC0C0091942D /* TestManagedMemory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TestManagedMemory.cpp; sourceTree = "<group>"; };
 		D8849BFF20139520009EE2D4 /* MatchSyllables.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MatchSyllables.cpp; sourceTree = "<group>"; };
@@ -69,6 +79,8 @@
 		D88DF471200D54740076F5EE /* DynamicTimeMatcher.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DynamicTimeMatcher.cpp; sourceTree = "<group>"; };
 		D88DF472200D54740076F5EE /* DynamicTimeMatcher.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DynamicTimeMatcher.hpp; sourceTree = "<group>"; };
 		D898B9B9200EF9CD0090338B /* dtm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dtm.cpp; sourceTree = "<group>"; };
+		D8A3F6392090D6E500F1311D /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		D8A3F63C2090D77B00F1311D /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		D8AACCFB201254EA007A1A93 /* catch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = catch.hpp; sourceTree = "<group>"; };
 		D8BC76B9207CE5E400AF62E5 /* Matlab.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Matlab.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -78,7 +90,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D855A92F20128E1800BF97FD /* libsndfile.1.dylib in Frameworks */,
+				D8A3F63E2090EC8700F1311D /* CoreAudio.framework in Frameworks */,
+				D8A3F63D2090D77B00F1311D /* AudioToolbox.framework in Frameworks */,
 				D884B7C220092CD4005CFC9D /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -87,7 +100,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D855A92E20128E0800BF97FD /* libsndfile.1.dylib in Frameworks */,
 				D855A902201258D700BF97FD /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -126,6 +138,7 @@
 			isa = PBXGroup;
 			children = (
 				D8AACCF820124445007A1A93 /* Library */,
+				D86F7A67209211E5004F3C7E /* TPCircularBuffer */,
 				D8AACCF920125462007A1A93 /* Bela */,
 				D8AACCF720124421007A1A93 /* Matlab */,
 				D831CB562007F2E0008C67E3 /* main.cpp */,
@@ -133,9 +146,24 @@
 			path = BelaWarpDetect;
 			sourceTree = "<group>";
 		};
+		D86F7A67209211E5004F3C7E /* TPCircularBuffer */ = {
+			isa = PBXGroup;
+			children = (
+				D86F7A68209211E5004F3C7E /* TPCircularBuffer.h */,
+				D86F7A69209211E5004F3C7E /* TPCircularBuffer+AudioBufferList.c */,
+				D86F7A6A209211E5004F3C7E /* TPCircularBuffer.podspec */,
+				D86F7A6B209211E5004F3C7E /* README.markdown */,
+				D86F7A6C209211E5004F3C7E /* TPCircularBuffer.c */,
+				D86F7A6D209211E5004F3C7E /* TPCircularBuffer+AudioBufferList.h */,
+			);
+			path = TPCircularBuffer;
+			sourceTree = "<group>";
+		};
 		D884B7C020092CD4005CFC9D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D8A3F63C2090D77B00F1311D /* AudioToolbox.framework */,
+				D8A3F6392090D6E500F1311D /* CoreAudio.framework */,
 				D855A92D20128E0800BF97FD /* libsndfile.1.dylib */,
 				D884B7C120092CD4005CFC9D /* Accelerate.framework */,
 			);
@@ -268,11 +296,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D855A905201279C100BF97FD /* LoadAudio.cpp in Sources */,
+				D86F7A70209211E5004F3C7E /* TPCircularBuffer.c in Sources */,
 				D884B7BF20080529005CFC9D /* CircularShortTimeFourierTransform.cpp in Sources */,
 				D8849C0120139520009EE2D4 /* MatchSyllables.cpp in Sources */,
+				D8A3F6372090D68600F1311D /* LoadAudio.cpp in Sources */,
 				D831CB572007F2E0008C67E3 /* main.cpp in Sources */,
 				D88DF473200D54740076F5EE /* DynamicTimeMatcher.cpp in Sources */,
+				D86F7A6E209211E5004F3C7E /* TPCircularBuffer+AudioBufferList.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,8 +313,10 @@
 				D855A900201255E300BF97FD /* CircularShortTimeFourierTransform.cpp in Sources */,
 				D8807BB82017CC0C0091942D /* TestManagedMemory.cpp in Sources */,
 				D855A8FF201255DC00BF97FD /* TestCircularShortTimeFourierTransform.cpp in Sources */,
-				D855A906201279C100BF97FD /* LoadAudio.cpp in Sources */,
 				D855A8FA2012557B00BF97FD /* main.cpp in Sources */,
+				D8A3F6382090D68600F1311D /* LoadAudio.cpp in Sources */,
+				D86F7A6F209211E5004F3C7E /* TPCircularBuffer+AudioBufferList.c in Sources */,
+				D86F7A71209211E5004F3C7E /* TPCircularBuffer.c in Sources */,
 				D855A9312012912200BF97FD /* TestLoadAudio.cpp in Sources */,
 				D855A901201255E500BF97FD /* DynamicTimeMatcher.cpp in Sources */,
 			);

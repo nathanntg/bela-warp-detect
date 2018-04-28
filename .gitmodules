@@ -1,0 +1,3 @@
+[submodule "BelaWarpDetect/TPCircularBuffer"]
+	path = BelaWarpDetect/TPCircularBuffer
+	url = https://nathanntg@github.com/michaeltyson/TPCircularBuffer.git

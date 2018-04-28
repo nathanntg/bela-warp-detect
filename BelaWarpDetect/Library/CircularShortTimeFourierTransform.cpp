@@ -19,8 +19,15 @@ _fft_size(static_cast<fft_length_t>(ceil(log2(window_length)))),
 _fft_length(1 << _fft_size),
 _fft_length_half(_fft_length / 2),
 _window(_window_length),
+#if defined(BELA_MAJOR_VERSION)
 _buffer(buffer_size),
+#endif
 _samples_windowed(_fft_length) {
+#if !defined(BELA_MAJOR_VERSION)
+    // initialize buffer
+    TPCircularBufferInit(&_buffer, buffer_size * sizeof(fft_value_t));
+#endif
+    
     // initialize window to 1s
     for (unsigned int i = 0; i < _window_length; ++i) {
         _window[i] = 1.;
@@ -43,6 +50,10 @@ _samples_windowed(_fft_length) {
 
 CircularShortTermFourierTransform::~CircularShortTermFourierTransform() {
     // platform specific resources
+#if !defined(BELA_MAJOR_VERSION)
+    TPCircularBufferCleanup(&_buffer);
+#endif
+    
 #if defined(__APPLE__)
     vDSP_DFT_DestroySetup(_fft_config);
     
@@ -95,11 +106,17 @@ void CircularShortTermFourierTransform::SetWindowHamming() {
 
 // get length
 unsigned int CircularShortTermFourierTransform::GetLengthValues() {
+#if defined(BELA_MAJOR_VERSION)
     if (_ptr_write >= _ptr_read) {
         return _ptr_write - _ptr_read;
     }
     
     return _buffer_size + _ptr_write - _ptr_read;
+#else
+    uint32_t available_bytes = 0;
+    TPCircularBufferTail(&_buffer, &available_bytes);
+    return available_bytes / sizeof(fft_value_t);
+#endif
 }
 
 // get length in terms of number of columns (convenience)
@@ -108,6 +125,7 @@ unsigned int CircularShortTermFourierTransform::GetLengthColumns() {
 }
 
 unsigned int CircularShortTermFourierTransform::GetLengthCapacity() {
+#if defined(BELA_MAJOR_VERSION)
     // ptr_read == ptr_write means empty, therefore can not be completely full
     // can store up to buffer_size - 1
     
@@ -117,6 +135,11 @@ unsigned int CircularShortTermFourierTransform::GetLengthCapacity() {
     }
     
     return _buffer_size - (1 + _buffer_size + _ptr_write - _ptr_read);
+#else
+    uint32_t available_bytes = 0;
+    TPCircularBufferHead(&_buffer, &available_bytes);
+    return available_bytes / sizeof(fft_value_t);
+#endif
 }
 
 unsigned int CircularShortTermFourierTransform::GetLengthPower() {
@@ -124,8 +147,12 @@ unsigned int CircularShortTermFourierTransform::GetLengthPower() {
 }
 
 void CircularShortTermFourierTransform::Clear() {
+#if defined(BELA_MAJOR_VERSION)
     _ptr_read = 0;
     _ptr_write = 0;
+#else
+    TPCircularBufferClear(&_buffer);
+#endif
 }
 
 unsigned int CircularShortTermFourierTransform::ConvertSamplesToColumns(unsigned int samples) {
@@ -169,6 +196,7 @@ void CircularShortTermFourierTransform::ZeroPadToEdge() {
 
 // write to the circular buffer
 bool CircularShortTermFourierTransform::WriteValues(const std::vector<fft_value_t>& values) {
+#if defined(BELA_MAJOR_VERSION)
     // check for sufficient space
     if (values.size() > GetLengthCapacity()) {
         return false;
@@ -181,9 +209,14 @@ bool CircularShortTermFourierTransform::WriteValues(const std::vector<fft_value_
     }
     
     return true;
+#else
+    unsigned int bytes = static_cast<unsigned int>(values.size()) * sizeof(fft_value_t);
+    return TPCircularBufferProduceBytes(&_buffer, &values[0], bytes);
+#endif
 }
 
 bool CircularShortTermFourierTransform::WriteValues(const fft_value_t *values, const unsigned int len, const unsigned int stride) {
+#if defined(BELA_MAJOR_VERSION)
     // check for sufficient space
     if (len > GetLengthCapacity()) {
         return false;
@@ -196,10 +229,14 @@ bool CircularShortTermFourierTransform::WriteValues(const fft_value_t *values, c
     }
     
     return true;
+#else
+    return TPCircularBufferProduceBytes(&_buffer, values, len * sizeof(fft_value_t));
+#endif
 }
 
 // read power
 bool CircularShortTermFourierTransform::ReadPower(fft_value_t *power) {
+#if defined(BELA_MAJOR_VERSION)
     // check for sufficient values
     if (GetLengthValues() < _window_length) {
         return false;
@@ -212,6 +249,31 @@ bool CircularShortTermFourierTransform::ReadPower(fft_value_t *power) {
     
     // advance read pointer
     _ptr_read = (_ptr_read + _window_stride) % _buffer_size;
+#else
+    // get tail of circular buffer and available bytes
+    unsigned int available_bytes = 0;
+    fft_value_t *src = static_cast<fft_value_t *>(TPCircularBufferTail(&_buffer, &available_bytes));
+    
+    // convert to samples
+    unsigned int available_samples = available_bytes / sizeof(fft_value_t);
+    
+    // check for sufficient values
+    if (available_samples < _window_length) {
+        return false;
+    }
+    
+    // window the samples
+#if defined(__APPLE__)
+    vDSP_vmul(src, 1, _window.ptr(), 1, _samples_windowed.ptr(), 1, _window_length);
+#else
+    for (unsigned int i = 0; i < _window_length; ++i) {
+        _samples_windowed[i] = src[i] * _window[i];
+    }
+#endif
+    
+    // free bytes
+    TPCircularBufferConsume(&_buffer, static_cast<uint32_t>(_window_stride));
+#endif
     
 #if defined(__APPLE__)
     // pack samples

@@ -14,6 +14,10 @@
 
 #include "ManagedMemory.hpp"
 
+#if !defined(BELA_MAJOR_VERSION)
+#include "TPCircularBuffer.h"
+#endif
+
 #if defined(__APPLE__)
 #include <Accelerate/Accelerate.h>
 
@@ -92,9 +96,13 @@ private:
     fft_length_t _fft_length_half;
     
     ManagedMemory<fft_value_t> _window;
+#if defined(BELA_MAJOR_VERSION)
     ManagedMemory<fft_value_t> _buffer; // circular buffer used to store values
     unsigned int _ptr_write = 0; // point to write in sample vector
     unsigned int _ptr_read = 0; // point to read in sample vector
+#else
+    TPCircularBuffer _buffer; // circular buffer
+#endif
     
     ManagedMemory<fft_value_t> _samples_windowed; // store windowed values
 };

@@ -8,9 +8,17 @@
 
 #include "LoadAudio.hpp"
 
+#if defined(__APPLE__)
+
+#else
 #include <sndfile.h>
+#endif
 
 bool LoadAudio(std::string file, std::vector<float> &samples, float &sample_rate, unsigned int channel) {
+#if defined(__APPLE__)
+    // TODO: write using core audio
+    return false;
+#else
     SNDFILE *sf;
     SF_INFO sf_info;
     sf_info.format = 0;
@@ -77,4 +85,5 @@ bool LoadAudio(std::string file, std::vector<float> &samples, float &sample_rate
     free(mem);
     
     return true;
+#endif
 }
