@@ -15,7 +15,9 @@
 MatchSyllables *gMatcher;
 
 // output status
-bool gOutput = false;
+unsigned int gTTL = 0;
+unsigned int gFeedbackSamples = 0;
+//unsigned int gFeedbackDebounce = 0;
 
 // anciliary task
 AuxiliaryTask gMatchTask;
@@ -24,6 +26,7 @@ AuxiliaryTask gMatchTask;
 WriteFile gLogFile;
 
 void process_match_background(void *);
+void on_match(size_t, float, int);
 
 bool setup(BelaContext *context, void *userData)
 {
@@ -33,10 +36,14 @@ bool setup(BelaContext *context, void *userData)
     gMatcher = new MatchSyllables(context->audioSampleRate);
     
     // load syllable
-    if (-1 == gMatcher->AddSpectrogram("syllable01.bin", 1)) {
+    // gMatcher->AddSpectrogram("syllable04.bin", 0.392858, 0.2)
+    if (-1 == gMatcher->AddSpectrogram("syllable01.bin", 0.372151, 0.2)) {
         rt_printf("Unable to load syllable file.\n");
         return false;
     }
+    
+    // set callback
+    gMatcher->SetCallbackMatch(on_match);
     
     // initialize matcher
     if (!gMatcher->Initialize()) {
@@ -62,24 +69,33 @@ bool setup(BelaContext *context, void *userData)
 
 void process_match_background(void *)
 {
-    float scores[1];
-    int lens[1];
-    while (gMatcher->MatchOnce(&scores[0], &lens[0])) {
-        if (scores[0] > 0.372151 && lens[0] > -14 && lens[0] < 14) {
-            gLogFile.log(scores[0]);
-            gOutput = true;
-        }
+    gMatcher->PerformMatching();
+}
+
+void on_match(size_t index, float score, int last_len)
+{
+    if (0 == index) {
+        // output score
+        gLogFile.log(score);
+        
+        // ttl pulse
+        gTTL = 1;
+        
+        // 30ms of feedback
+        gFeedbackSamples = 1323;
     }
 }
 
 void render(BelaContext *context, void *userData)
 {
+    bool isInterleaved = context->flags & BELA_FLAG_INTERLEAVED;
+    
     unsigned int numAudioFrames = context->audioFrames;
     unsigned int numAudioInChannels = context->audioInChannels;
     unsigned int numAudioOutChannels = context->audioOutChannels;
     
     // input
-    if (context->flags & BELA_FLAG_INTERLEAVED) {
+    if (isInterleaved) {
         // interleaved input, use stride
         gMatcher->IngestAudio(context->audioIn, numAudioFrames, numAudioInChannels);
     }
@@ -88,36 +104,64 @@ void render(BelaContext *context, void *userData)
         gMatcher->IngestAudio(context->audioIn, numAudioFrames);
     }
     
-    // output
-    
     // zero outputs
     for (unsigned int i = 0; i < numAudioFrames * numAudioOutChannels; ++i) {
         context->audioOut[i] = 0.0;
     }
     
-    // WHITE NOISE (test, constant white noise on right channel)
-    // for (unsigned int i = 0; i < numAudioFrames; ++i) {
-    //     if (context->flags & BELA_FLAG_INTERLEAVED) {
-    //         context->audioOut[i * numAudioOutChannels] = 0.0;
-    //         context->audioOut[i * numAudioOutChannels + 1] = 0.4f * ( rand() / (float)RAND_MAX * 2.f - 1.f);
-    //     }
-    //     else {
-    //         context->audioOut[i] = 0.0;
-    //         context->audioOut[i + numAudioFrames] = 0.4f * ( rand() / (float)RAND_MAX * 2.f - 1.f);
-    //     }
-    // }
-    
-    // add TTL pulse
-    if (gOutput) {
-        for (unsigned int i = 0; i < 44; ++i) {
-            if (context->flags & BELA_FLAG_INTERLEAVED) {
-                context->audioOut[i * numAudioOutChannels] = 1.0;
+    // output: white noise
+    if (0 < gFeedbackSamples) {
+        for (unsigned int i = 0; i < numAudioFrames; ++i) {
+            // generate white noise
+            if (isInterleaved) {
+                context->audioOut[i * numAudioOutChannels + 1] = 0.4f * ( rand() / (float)RAND_MAX * 2.f - 1.f);
             }
             else {
-                context->audioOut[i] = 1.0;
+                context->audioOut[numAudioFrames + i] = 0.4f * ( rand() / (float)RAND_MAX * 2.f - 1.f);
+            }
+            
+            // stop samples
+            if (--gFeedbackSamples == 0) {
+                break;
             }
         }
-        gOutput = false;
+    }
+    
+    // output TTL
+    switch (gTTL) {
+        case 1:
+            // positive pulse
+            for (unsigned int i = 0; i < numAudioFrames; ++i) {
+                // generate white noise
+                if (isInterleaved) {
+                    context->audioOut[i * numAudioOutChannels] = 1.0;
+                }
+                else {
+                    context->audioOut[i] = 1.0;
+                }
+            }
+            
+            // clear TTL
+            gTTL = 0;
+            
+            break;
+            
+        case 2:
+            // negative pulse
+            for (unsigned int i = 0; i < numAudioFrames; ++i) {
+                // generate white noise
+                if (isInterleaved) {
+                    context->audioOut[i * numAudioOutChannels] = -1.0;
+                }
+                else {
+                    context->audioOut[i] = -1.0;
+                }
+            }
+            
+            // clear TTL
+            gTTL = 0;
+            
+            break;
     }
     
     // schedule task

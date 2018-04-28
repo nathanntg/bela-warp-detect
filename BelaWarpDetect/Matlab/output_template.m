@@ -6,6 +6,7 @@ load(fullfile(pth, fl));
 
 window_length = 512;
 window_stride = 60;
+log_power = false;
 
 bela_fs = 44100;
 
@@ -64,6 +65,8 @@ for syllable = syllables
     
     if length(audio) >= 5
         [tmpl, weights] = build_template(audio, fs, 'window_length', window_length, 'window_stride', window_stride, 'log_power', log_power);
+        
+        templates{syllable} = tmpl;
         
         v = single(tmpl);
         fh = fopen(fullfile(pth, 'bela', sprintf('syllable%02d.bin', syllable)), 'w');
