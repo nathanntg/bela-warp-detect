@@ -17,6 +17,8 @@
 bool LoadAudio(std::string file, std::vector<float> &samples, float &sample_rate, unsigned int channel) {
 #if defined(__APPLE__)
     // TODO: write using core audio
+    // https://developer.apple.com/library/content/technotes/tn2097/_index.html#//apple_ref/doc/uid/DTS10003287-CH1-PARTTWO
+    
     return false;
 #else
     SNDFILE *sf;

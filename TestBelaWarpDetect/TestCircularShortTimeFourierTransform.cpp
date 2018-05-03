@@ -15,6 +15,12 @@
 #define COMPARE_FLOAT(a, b) (abs((a) - (b)) < 1e-6)
 #define COMPARE_FLOAT_THRESH(a, b, threshold) (abs((a) - (b)) < threshold)
 
+#if defined(BELA_MAJOR_VERSION)
+#define STFT_EMPTY_CAPACITY(a) (a - 1)
+#else
+#define STFT_EMPTY_CAPACITY(a) (a)
+#endif
+
 TEST_CASE("Testing Circular STFT Window") {
     SECTION("Even Size") {
         unsigned int size = 16;
@@ -111,7 +117,7 @@ TEST_CASE("Testing Circular STFT Buffer") {
     SECTION("Empty Size") {
         // check initial size and capacity
         CHECK(stft.GetLengthValues() == 0);
-        CHECK(stft.GetLengthCapacity() == (buffer_size - 1));
+        CHECK(stft.GetLengthCapacity() == STFT_EMPTY_CAPACITY(buffer_size));
     }
     
     SECTION("Column Size") {
@@ -121,7 +127,7 @@ TEST_CASE("Testing Circular STFT Buffer") {
     
         // should have just under one column worth of data
         CHECK(stft.GetLengthValues() == (window_length - 1));
-        CHECK(stft.GetLengthCapacity() == ((buffer_size - 1) - (window_length - 1)));
+        CHECK(stft.GetLengthCapacity() == (STFT_EMPTY_CAPACITY(buffer_size) - (window_length - 1)));
         CHECK(stft.GetLengthColumns() == 0);
         
         // add single 0
@@ -130,7 +136,7 @@ TEST_CASE("Testing Circular STFT Buffer") {
         
         // should have one column worth of data
         CHECK(stft.GetLengthValues() == window_length);
-        CHECK(stft.GetLengthCapacity() == ((buffer_size - 1) - window_length));
+        CHECK(stft.GetLengthCapacity() == (STFT_EMPTY_CAPACITY(buffer_size) - window_length));
         CHECK(stft.GetLengthColumns() == 1);
         
         SECTION("Clear") {
@@ -139,7 +145,7 @@ TEST_CASE("Testing Circular STFT Buffer") {
         
             // check size and capacity
             CHECK(stft.GetLengthValues() == 0);
-            CHECK(stft.GetLengthCapacity() == (buffer_size - 1));
+            CHECK(stft.GetLengthCapacity() == STFT_EMPTY_CAPACITY(buffer_size));
         }
     }
     
@@ -150,7 +156,7 @@ TEST_CASE("Testing Circular STFT Buffer") {
         
         // should have just under one column worth of data
         CHECK(stft.GetLengthValues() == (window_length - 1));
-        CHECK(stft.GetLengthCapacity() == ((buffer_size - 1) - (window_length - 1)));
+        CHECK(stft.GetLengthCapacity() == (STFT_EMPTY_CAPACITY(buffer_size) - (window_length - 1)));
         CHECK(stft.GetLengthColumns() == 0);
         
         // zero pad
@@ -158,7 +164,7 @@ TEST_CASE("Testing Circular STFT Buffer") {
         
         // should have one column worth of data
         CHECK(stft.GetLengthValues() == window_length);
-        CHECK(stft.GetLengthCapacity() == ((buffer_size - 1) - window_length));
+        CHECK(stft.GetLengthCapacity() == (STFT_EMPTY_CAPACITY(buffer_size) - window_length));
         CHECK(stft.GetLengthColumns() == 1);
     }
     
