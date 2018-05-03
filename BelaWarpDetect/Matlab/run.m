@@ -9,6 +9,22 @@ window_length = 512;
 window_stride = 60;
 log_power = false;
 
+%% optional: combine consecutive syllable 3's
+oldElements = elements;
+newSyllableType = 33;
+for i = 1:length(elements)
+    type = elements{i}.segType(:);
+    fileStartTimes = elements{i}.segFileStartTimes(:);
+    fileEndTimes = elements{i}.segFileEndTimes(:);
+    
+    idx = type(1:(end - 1)) == 3 & type(2:end) == 3 & fileEndTimes(1:(end-1)) + 0.05 > fileStartTimes(2:end);
+    
+    elements{i}.segAbsStartTimes = elements{i}.segAbsStartTimes([idx; false]);
+    elements{i}.segFileStartTimes = elements{i}.segFileStartTimes([idx; false]);
+    elements{i}.segFileEndTimes = elements{i}.segFileEndTimes([false; idx]);
+    elements{i}.segType = ones(sum(idx), 1) * newSyllableType;
+end
+
 %% list of syllables
 segType = cellfun(@(x) x.segType, elements, 'UniformOutput', false);
 segType = sort(unique(cat(1, segType{:})));
@@ -56,7 +72,7 @@ for syllable = syllables
         templates{syllable} = tmpl;
     end
     
-    if syllable == 1
+    if syllable == 1 || (exist('newSyllableType', 'var') && newSyllableType == syllable)
         build_template(audio, fs, 'figures', true, 'window_length', window_length, 'window_stride', window_stride, 'log_power', log_power);
     end
 end
