@@ -68,8 +68,13 @@ for syllable = syllables
         
         templates{syllable} = tmpl;
         
+        if syllable >= 100
+            nm = sprintf('syllable%03d.bin', syllable);
+        else
+            nm = sprintf('syllable%02d.bin', syllable);
+        end
         v = single(tmpl);
-        fh = fopen(fullfile(pth, 'bela', sprintf('syllable%02d.bin', syllable)), 'w');
+        fh = fopen(fullfile(pth, 'bela', nm), 'w');
         fwrite(fh, v(:), 'single');
         fclose(fh);
     end

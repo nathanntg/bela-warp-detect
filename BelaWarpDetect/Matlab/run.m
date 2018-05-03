@@ -25,6 +25,23 @@ for i = 1:length(elements)
     elements{i}.segType = ones(sum(idx), 1) * newSyllableType;
 end
 
+%% optional: combine consecutive syllable 2's
+oldElements = elements;
+newSyllableType = 222;
+for i = 1:length(elements)
+    type = elements{i}.segType(:);
+    fileStartTimes = elements{i}.segFileStartTimes(:);
+    fileEndTimes = elements{i}.segFileEndTimes(:);
+    
+    idx = type(1:(end-2)) == 2 & type(2:(end-1)) == 2 & type(3:end) == 2 & fileEndTimes(1:(end-2)) + 0.05 > fileStartTimes(2:(end-1)) & fileEndTimes(2:(end-1)) + 0.05 > fileStartTimes(3:end);
+    
+    elements{i}.segAbsStartTimes = elements{i}.segAbsStartTimes([idx; false; false]);
+    elements{i}.segFileStartTimes = elements{i}.segFileStartTimes([idx; false; false]);
+    elements{i}.segFileEndTimes = elements{i}.segFileEndTimes([false; false; idx]);
+    elements{i}.segType = ones(sum(idx), 1) * newSyllableType;
+end
+
+
 %% list of syllables
 segType = cellfun(@(x) x.segType, elements, 'UniformOutput', false);
 segType = sort(unique(cat(1, segType{:})));
