@@ -272,7 +272,7 @@ bool CircularShortTermFourierTransform::ReadPower(fft_value_t *power) {
 #endif
     
     // free bytes
-    TPCircularBufferConsume(&_buffer, static_cast<uint32_t>(_window_stride));
+    TPCircularBufferConsume(&_buffer, static_cast<uint32_t>(_window_stride) * sizeof(fft_value_t));
 #endif
     
 #if defined(__APPLE__)
