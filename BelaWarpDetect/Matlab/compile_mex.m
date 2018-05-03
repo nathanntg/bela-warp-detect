@@ -59,14 +59,12 @@ end
 % add parent directory as include path
 root = fileparts(pwd);
 cf{end + 1} = ['-I' root];
+cf{end + 1} = ['-I' fullfile(root, 'TPCircularBuffer')];
 
 % build cflags
 if numel(cf) > 0
     c{end + 1} = ['CFLAGS="\$CFLAGS ' strjoin(cf) '"'];
 end
-
-% include sndfile
-lf{end + 1} = '-lsndfile.1';
 
 % include Accelerate framework
 if ismac
@@ -76,9 +74,9 @@ end
 c{end + 1} = ['LDFLAGS="\$LDFLAGS ' strjoin(lf) '"'];
 
 % call mex functions
-functions = {{'Matlab/dtm.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp'}, ...
-    {'Matlab/match_syllables.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp', 'Library/LoadAudio.cpp', 'Library/MatchSyllables.cpp'}, ...
-    {'Matlab/eval_syllable.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp', 'Library/LoadAudio.cpp', 'Library/MatchSyllables.cpp'}};
+functions = {{'Matlab/dtm.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp', 'TPCircularBuffer/TPCircularBuffer.c'}, ...
+    {'Matlab/match_syllables.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp', 'Library/LoadAudio.cpp', 'Library/MatchSyllables.cpp', 'TPCircularBuffer/TPCircularBuffer.c'}, ...
+    {'Matlab/eval_syllable.cpp', 'Library/CircularShortTimeFourierTransform.cpp', 'Library/DynamicTimeMatcher.cpp', 'Library/LoadAudio.cpp', 'Library/MatchSyllables.cpp', 'TPCircularBuffer/TPCircularBuffer.c'}};
 for j = 1:length(functions)
     if iscell(functions{j})
         fprintf('%s\n', functions{j}{1});
