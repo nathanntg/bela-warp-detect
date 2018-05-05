@@ -141,6 +141,8 @@ float DynamicTimeMatcher::_ScoreFeatures(const float *tmpl_feature, const float 
         norm_s += ss * ss;
     }
     
+    // check power?
+    
     float result = dot / (sqrt(norm_t) * sqrt(norm_s));
     return 1.f - result;
 }

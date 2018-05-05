@@ -354,8 +354,8 @@ for i = 1:length(templates)
 end
 
 %% show results
-syllable = 1;
-threshold = 0.467232;
+syllable = 222;
+threshold = 0.577435;
 
 for i = 1:length(keys)
     if ~exist(fullfile(pth, keys{i}), 'file')
