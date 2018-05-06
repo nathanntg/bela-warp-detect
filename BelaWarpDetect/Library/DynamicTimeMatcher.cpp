@@ -142,6 +142,9 @@ float DynamicTimeMatcher::_ScoreFeatures(const float *tmpl_feature, const float 
     }
     
     // check power?
+    if (norm_t < 0.5 && norm_s < 0.5) {
+        return 0.f;
+    }
     
     float result = dot / (sqrt(norm_t) * sqrt(norm_s));
     return 1.f - result;
