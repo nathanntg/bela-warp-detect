@@ -23,22 +23,15 @@ The code supports:
 * macOS (with a few additional requirements), via either the C++ API or MATLAB MEX files
 * Bela embedded platform
 
-To use on macOS, you must install:
+To use on macOS, you must have:
 
-* [libsndfile](http://www.mega-nerd.com/libsndfile/) - The same framework used by Bela for loading audio files. (Could potentially remove this requirement by using system APIs for parsing audio.)
 * Xcode - The project is packaged as an Xcode project for building and testing, and installing Xcode installs the necessary compiler and other functionality for compiling the mex files.
 
 
 Compiling on Bela
 -----------------
 
-There is a help script that will create a project directory, copy all files onto the Bela and compile the project:
-
-```
-> ./bela_install.sh
-```
-
-Once installed, subsequent code changes can be uploaded with the command:
+To install, create a feedback project on the bela. Once created, you can copy or update the needed files using the command:
 
 ```
 > ./bela_update.sh
