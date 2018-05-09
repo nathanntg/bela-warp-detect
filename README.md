@@ -11,7 +11,8 @@ The implementation here uses a dynamic programming approach to syllable detectio
 reducing the need to amass a huge amount of data or perform a long training process.
 
 The detection is designed to be usable from MATLAB (for training and performance 
-evaluation), and is designed to be run on a [Bela](http://bela.io) embedded platform 
+evaluation), and is designed to be run on either a Mac computer (using Core Audio for low 
+latency audio input and output) or on a [Bela](http://bela.io) embedded platform 
 (which uses a real time operating system and is capable of audio signal processing).
 
 
@@ -20,7 +21,7 @@ Requirements
 
 The code supports:
 
-* macOS (with a few additional requirements), via either the C++ API or MATLAB MEX files
+* macOS, via either the C++ API or MATLAB MEX files
 * Bela embedded platform
 
 To use on macOS, you must have:
@@ -40,6 +41,18 @@ To install, create a feedback project on the bela. Once created, you can copy or
 Alternatively, you can use the web based IDE or manually move files onto the Bela. The project directory structure does not need to be preserved, and to run, you need to upload the appropriate "render.cpp" file and all files in "BelaWarpDetect/Library".
 
 Note that the project needs C++11. As a result, it should be configured with the make parameter `CPPFLAGS=-std=c++11`.
+
+Running on macOS
+----------------
+
+In addition to running under the realtime conditions of the Bela board, the matching
+can be run from a Mac computer. The macOS implementation uses Core Audio for low latency
+audio input and output, with relatively low computational demands.
+
+The macOS implementation is written in "BelaWarpDetect/main.cpp" and reads in a template
+file specified in the code (eventually this will be revised to allow for command line
+arguments).
+
 
 MATLAB Interface
 ----------------
