@@ -357,7 +357,7 @@ int main(int argc, const char * argv[]) {
     }
     
     // load syllable
-    if (-1 == matcher.AddSpectrogram("syllable222.bin", 0.577435, 0.2)) {
+    if (-1 == matcher.AddSpectrogram("syllable777.bin", 0.6, 0.2)) {
         std::cerr << "Unable to load syllable file." << std::endl;
         return 1;
     }
