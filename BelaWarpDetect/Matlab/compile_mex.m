@@ -66,9 +66,10 @@ if numel(cf) > 0
     c{end + 1} = ['CFLAGS="\$CFLAGS ' strjoin(cf) '"'];
 end
 
-% include Accelerate framework
+% include frameworks
 if ismac
     lf{end + 1} = '-framework Accelerate';
+    lf{end + 1} = '-framework AudioToolbox';
 end
 
 c{end + 1} = ['LDFLAGS="\$LDFLAGS ' strjoin(lf) '"'];
