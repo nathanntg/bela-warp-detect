@@ -20,8 +20,8 @@ _length(templ.size()),
 _tmpl(_features * _length),
 _alpha(_length),
 _normalize(0),
-_dpp_score(2 * (_length + 1)),
-_dpp_len(2 * (_length + 1)) {
+_dpp_score(3 * (_length + 1)),
+_dpp_len(3 * (_length + 1)) {
     // require non-zero length and feature size
     if (templ.empty() || templ[0].empty()) {
         throw std::invalid_argument("requires non-empty template with non-empty feature vector");
@@ -55,8 +55,8 @@ _length(length),
 _tmpl(_features * _length),
 _alpha(_length),
 _normalize(0),
-_dpp_score(2 * (_length + 1)),
-_dpp_len(2 * (_length + 1)) {
+_dpp_score(3 * (_length + 1)),
+_dpp_len(3 * (_length + 1)) {
     // copy template features
     memcpy(_tmpl.ptr(), templ, sizeof(float) * length * features);
     
@@ -103,7 +103,7 @@ void DynamicTimeMatcher::Reset() {
     
     _dpp_score[0] = 0.0;
     _dpp_len[0] = 0;
-    for (unsigned int i = 1; i < (_length + 1); ++i) {
+    for (unsigned int i = 1; i < _dpp_score.size(); ++i) {
         _dpp_score[i] = std::numeric_limits<float>::max();
         // dpp_len should not matter, since score is maxed out
     }
@@ -155,6 +155,8 @@ struct dtm_out DynamicTimeMatcher::IngestFeatureVector(const float *features) {
     struct dtm_out ret = {-1.0, -1.0, 0};
     
     // pointers to alternating DPP results
+    float *_lstlst_score;
+    unsigned int *_lstlst_len;
     float *_lst_score;
     unsigned int *_lst_len;
     float *_cur_score;
@@ -164,13 +166,26 @@ struct dtm_out DynamicTimeMatcher::IngestFeatureVector(const float *features) {
         _lst_len = _dpp_len.ptr();
         _cur_score = _dpp_score.ptr() + (_length + 1);
         _cur_len = _dpp_len.ptr() + (_length + 1);
+        _lstlst_score = _dpp_score.ptr() + (_length + 1 + _length + 1);
+        _lstlst_len = _dpp_len.ptr() + (_length + 1 + _length + 1);
         _idx = 1;
     }
-    else {
+    else if (_idx == 1) {
         _lst_score = _dpp_score.ptr() + (_length + 1);
         _lst_len = _dpp_len.ptr() + (_length + 1);
+        _cur_score = _dpp_score.ptr() + (_length + 1 + _length + 1);
+        _cur_len = _dpp_len.ptr() + (_length + 1 + _length + 1);
+        _lstlst_score = _dpp_score.ptr();
+        _lstlst_len = _dpp_len.ptr();
+        _idx = 2;
+    }
+    else {
+        _lst_score = _dpp_score.ptr() + (_length + 1 + _length + 1);
+        _lst_len = _dpp_len.ptr() + (_length + 1 + _length + 1);
         _cur_score = _dpp_score.ptr();
         _cur_len = _dpp_len.ptr();
+        _lstlst_score = _dpp_score.ptr() + (_length + 1);
+        _lstlst_len = _dpp_len.ptr() + (_length + 1);
         _idx = 0;
     }
     
@@ -196,17 +211,19 @@ struct dtm_out DynamicTimeMatcher::IngestFeatureVector(const float *features) {
             len = _lst_len[i] + 1;
             
             // up (move in template space, but not in signal space)
-            t_score = _cur_score[i] + cost * alpha;
-            if (t_score < score) {
-                score = t_score;
-                len = _cur_len[i];
+            if (i > 0) {
+                t_score = _cur_score[i - 1] + cost * 4.;
+                if (t_score < score) {
+                    score = t_score;
+                    len = _cur_len[i - 1] + 1;
+                }
             }
             
             // left (move in signal space, not in template space)
-            t_score = _lst_score[i + 1] + cost * alpha;
+            t_score = _lstlst_score[i + 1] + cost * 4.;
             if (t_score < score) {
                 score = t_score;
-                len = _lst_len[i + 1] + 1;
+                len = _lstlst_len[i + 1] + 2;
             }
         }
         
