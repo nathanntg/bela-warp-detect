@@ -212,7 +212,7 @@ struct dtm_out DynamicTimeMatcher::IngestFeatureVector(const float *features) {
             
             // up (move in template space, but not in signal space)
             if (i > 0) {
-                t_score = _cur_score[i - 1] + cost * 4.;
+                t_score = _cur_score[i - 1] + cost * alpha;
                 if (t_score < score) {
                     score = t_score;
                     len = _cur_len[i - 1] + 1;
@@ -220,7 +220,7 @@ struct dtm_out DynamicTimeMatcher::IngestFeatureVector(const float *features) {
             }
             
             // left (move in signal space, not in template space)
-            t_score = _lstlst_score[i + 1] + cost * 4.;
+            t_score = _lstlst_score[i + 1] + cost * alpha;
             if (t_score < score) {
                 score = t_score;
                 len = _lstlst_len[i + 1] + 2;
