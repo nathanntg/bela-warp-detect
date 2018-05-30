@@ -1,6 +1,6 @@
 %% setup
-pth = '/Volumes/screening/llb3/';
-fl = 'llb3_annotation_ordered.mat';
+pth = '~/Documents/School/BU/Gardner Lab/Syllable Match/llb3/spring';
+fl = 'llb3_auto_annotation.mat';
 
 load(fullfile(pth, fl));
 
