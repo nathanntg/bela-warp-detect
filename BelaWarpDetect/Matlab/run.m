@@ -219,8 +219,8 @@ axis square;
 title('Known confusion matrix');
 
 %% plot roc
-for i = 1:length(syllables)
-    if isempty(syllables{i})
+for i = 1:length(templates)
+    if isempty(templates{i})
         continue;
     end
     
