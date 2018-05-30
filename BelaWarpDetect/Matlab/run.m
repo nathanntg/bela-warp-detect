@@ -73,6 +73,32 @@ for i = 1:length(elements)
     elements{i}.segType = type([idx; false]);
 end
 
+%% optional: transitions
+pairs = [6 1; 6 3; 7 3; 7 8; 7 13; 13 3; 13 8; 13 14; 14 4; 14 6; 14 13; 15 8; 15 24];
+
+oldElements = elements;
+for i = 1:length(elements)
+    type = elements{i}.segType(:);
+    fileStartTimes = elements{i}.segFileStartTimes(:);
+    fileEndTimes = elements{i}.segFileEndTimes(:);
+    
+    % make place holder
+    idx = false(length(type), 1);
+    newType = zeros(length(type), 1);
+    if length(type) > 1
+        for j = 1:size(pairs, 1)
+            c_idx = type(1:(end - 1)) == pairs(j, 1) & type(2:end) == pairs(j, 2) & fileEndTimes(1:(end-1)) + 0.25 > fileStartTimes(2:end);
+            idx([c_idx; false]) = true;
+            newType([c_idx; false]) = pairs(j, 1) * 100 + pairs(j, 2);
+        end
+    end
+    
+    elements{i}.segAbsStartTimes = elements{i}.segAbsStartTimes(idx);
+    elements{i}.segFileStartTimes = elements{i}.segFileStartTimes(idx);
+    elements{i}.segFileEndTimes = elements{i}.segFileEndTimes(idx);
+    elements{i}.segType = newType(idx);
+end
+
 %% list of syllables
 segType = cellfun(@(x) x.segType, elements, 'UniformOutput', false);
 segType = sort(unique(cat(1, segType{:})));
