@@ -95,7 +95,7 @@ for i = 1:length(elements)
     
     elements{i}.segAbsStartTimes = elements{i}.segAbsStartTimes(idx);
     elements{i}.segFileStartTimes = elements{i}.segFileStartTimes(idx);
-    elements{i}.segFileEndTimes = elements{i}.segFileEndTimes(idx);
+    elements{i}.segFileEndTimes = elements{i}.segFileEndTimes([false; idx(1:(end-1))]);
     elements{i}.segType = newType(idx);
 end
 
