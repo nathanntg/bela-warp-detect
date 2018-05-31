@@ -442,6 +442,11 @@ for i = 1:length(keys)
         locs = [];
     end
     
+    % skip uninteresting ones
+    if ~ismember(syllable, elements{i}.segType) && isempty(pks)
+        continue;
+    end
+    
     figure;
 
     ax1 = subplot(3, 1, 1);
