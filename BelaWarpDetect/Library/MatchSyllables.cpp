@@ -181,6 +181,9 @@ void MatchSyllables::Reset() {
         // clear circular buffer
         _stft.Clear();
         
+        // clear flag
+        _match_state = 0;
+        
         // flush matches
         for (auto it = _dtms.begin(); it != _dtms.end(); ++it) {
             it->dtm.Reset();
@@ -221,6 +224,36 @@ bool MatchSyllables::MatchOnce(float *score, int *len) {
         return false;
     }
     
+    if (0 != _match_state) {
+        float sum = 0.;
+        for (size_t i = _idx_lo; i < _idx_hi; ++i) {
+            sum += _features[i];
+        }
+        
+        // power decreasing
+        if (sum < 16.) {
+            // trigger feedback
+            if (_cb_match) {
+                _cb_match(_next_index, 0, 0);
+            }
+            
+            // reset state
+            _match_state = 0;
+        }
+        
+        if (_cb_column) {
+            std::vector<float> scores = std::vector<float>(_next_index);
+            std::vector<int> lengths = std::vector<int>(_next_index);
+            for (auto it = _dtms.begin(); it != _dtms.end(); ++it) {
+                scores[it->index] = (0 == _match_state ? 1. : 0.);
+                lengths[it->index] = 0;
+            }
+            _cb_column(scores, lengths);
+        }
+        
+        return true;
+    }
+    
     for (auto it = _dtms.begin(); it != _dtms.end(); ++it) {
         struct dtm_out out = it->dtm.IngestFeatureVector(&_features[_idx_lo]);
         
@@ -235,6 +268,9 @@ bool MatchSyllables::MatchOnce(float *score, int *len) {
                 // trigger callback
                 _cb_match(it->index, it->last_score, it->last_len);
             }
+            
+            // set match state
+            _match_state = 1;
             
             // reset DTM? OR reset all?
             it->dtm.Reset();

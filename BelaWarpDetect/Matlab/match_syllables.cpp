@@ -21,7 +21,6 @@ void cbAppendResult(std::vector<float> scores, std::vector<int> lengths) {
     result_length.push_back(lengths);
 }
 
-
 /* the gateway function */
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     float sampling_rate;

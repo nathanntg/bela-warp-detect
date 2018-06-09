@@ -68,7 +68,9 @@ for syllable = syllables
         
         templates{syllable} = tmpl;
         
-        if syllable >= 100
+        if syllable >= 1000
+            nm = sprintf('syllable%04d.bin', syllable);
+        elseif syllable >= 100
             nm = sprintf('syllable%03d.bin', syllable);
         else
             nm = sprintf('syllable%02d.bin', syllable);

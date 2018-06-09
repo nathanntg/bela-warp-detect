@@ -99,6 +99,49 @@ for i = 1:length(elements)
     elements{i}.segType = newType(idx);
 end
 
+
+%% optional: transitions
+pairs = [15 8];
+
+oldElements = elements;
+for i = 1:length(elements)
+    type = elements{i}.segType(:);
+    fileStartTimes = elements{i}.segFileStartTimes(:);
+    fileEndTimes = elements{i}.segFileEndTimes(:);
+    
+    % make place holder
+    idx = false(length(type), 1);
+    newType = zeros(length(type), 1);
+    if length(type) > 1
+        for j = 1:size(pairs, 1)
+            c_idx = type(1:(end - 1)) == pairs(j, 1) & type(2:end) == pairs(j, 2) & fileEndTimes(1:(end-1)) + 0.25 > fileStartTimes(2:end);
+            idx([c_idx; false]) = true;
+            newType([c_idx; false]) = pairs(j, 1) * 100 + pairs(j, 2);
+        end
+    end
+    
+    elements{i}.segAbsStartTimes = elements{i}.segAbsStartTimes(idx);
+    elements{i}.segFileStartTimes = elements{i}.segFileStartTimes(idx);
+    elements{i}.segFileEndTimes = elements{i}.segFileEndTimes([false; idx(1:(end-1))]);
+    elements{i}.segType = newType(idx);
+end
+
+%% optional: combine 6 -> 3 -> 3
+oldElements = elements;
+newSyllableType = 633;
+for i = 1:length(elements)
+    type = elements{i}.segType(:);
+    fileStartTimes = elements{i}.segFileStartTimes(:);
+    fileEndTimes = elements{i}.segFileEndTimes(:);
+    
+    idx = type(1:(end-2)) == 6 & type(2:(end-1)) == 3 & type(3:end) == 3 & fileEndTimes(1:(end-2)) + 0.25 > fileStartTimes(2:(end-1)) & fileEndTimes(2:(end-1)) + 0.15 > fileStartTimes(3:end);
+    
+    elements{i}.segAbsStartTimes = elements{i}.segAbsStartTimes([idx; false; false]);
+    elements{i}.segFileStartTimes = elements{i}.segFileStartTimes([idx; false; false]);
+    elements{i}.segFileEndTimes = elements{i}.segFileEndTimes([false; false; idx]);
+    elements{i}.segType = ones(sum(idx), 1) * newSyllableType;
+end
+
 %% list of syllables
 segType = cellfun(@(x) x.segType, elements, 'UniformOutput', false);
 segType = sort(unique(cat(1, segType{:})));
@@ -177,7 +220,7 @@ for i = 1:length(keys)
     
     % unique segments
     for j = 1:length(elements{i}.segType)
-        strt = round(elements{i}.segFileStartTimes(j) * fs);
+        strt = max(round(elements{i}.segFileStartTimes(j) * fs), 1);
         stop = round(elements{i}.segFileEndTimes(j) * fs);
         to_evaluate{j} = y(strt:stop);
         actual(idx + j) = elements{i}.segType(j);

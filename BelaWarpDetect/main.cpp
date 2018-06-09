@@ -127,7 +127,7 @@ void on_signal(int signum) {
 }
 
 void on_match(size_t index, float score, int length) {
-    if (0 == index) {
+    if (1 == index) {
         // ttl pulse
         gTTL = 1;
         
@@ -357,7 +357,7 @@ int main(int argc, const char * argv[]) {
     }
     
     // load syllable
-    if (-1 == matcher.AddSpectrogram("syllable777.bin", 0.6, 0.2)) {
+    if (-1 == matcher.AddSpectrogram("syllable1508.bin", 0.752649, 0.2)) {
         std::cerr << "Unable to load syllable file." << std::endl;
         return 1;
     }

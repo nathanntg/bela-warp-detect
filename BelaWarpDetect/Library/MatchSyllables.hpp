@@ -92,6 +92,8 @@ private:
     
     bool _initialized = false;
     
+    unsigned int _match_state = 0;
+    
     // next index
     size_t _next_index = 0;
     
