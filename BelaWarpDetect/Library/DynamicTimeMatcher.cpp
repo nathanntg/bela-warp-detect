@@ -146,6 +146,11 @@ float DynamicTimeMatcher::_ScoreFeatures(const float *tmpl_feature, const float 
         return 0.f;
     }
     
+    // deal with absolute silence (division by zero), only comes up in testing
+    if (norm_t == 0.0 || norm_s == 0.0) {
+        return 1.f;
+    }
+    
     float result = dot / (sqrt(norm_t) * sqrt(norm_s));
     return 1.f - result;
 }
