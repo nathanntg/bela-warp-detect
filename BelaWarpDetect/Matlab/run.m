@@ -9,6 +9,9 @@ window_length = 512;
 window_stride = 60;
 log_power = false;
 
+% manually review templates
+manually_review = true;
+
 %% optional: combine consecutive syllable 3's
 oldElements = elements;
 newSyllableType = 33;
@@ -182,6 +185,12 @@ for syllable = syllables
             
             audio{end + 1} = y(strt:stop);
         end
+    end
+    
+    % filter audio segments
+    if manually_review
+        fprintf('Review audio for syllable %d...\n', syllable);
+        audio = review_audio(audio, fs, 'max_instances', 100);
     end
     
     if length(audio) >= 5
