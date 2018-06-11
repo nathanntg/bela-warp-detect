@@ -1,16 +1,18 @@
 %% setup
+pth = '~/Documents/School/BU/Gardner Lab/Syllable Match/llb3/summer';
+fl = 'llb3_annotation_06102018.mat';
 pth = '~/Documents/School/BU/Gardner Lab/Syllable Match/llb3/spring';
 fl = 'llb3_auto_annotation.mat';
 
 load(fullfile(pth, fl));
 
 % if you change these constants, you must also change the C++ defaults
-window_length = 512;
+window_length = 256;
 window_stride = 60;
 log_power = false;
 
 % manually review templates
-manually_review = true;
+manually_review = false;
 
 %% optional: combine consecutive syllable 3's
 oldElements = elements;
@@ -170,6 +172,9 @@ for syllable = syllables
 
         % load audio
         [y, fs] = audioread(fullfile(pth, keys{i}));
+        if size(y, 2) > 1
+            y = y(:, 1);
+        end
 
         % unique segments
         for j = idx'
@@ -180,8 +185,8 @@ for syllable = syllables
             end
             
             % add a little padding
-            strt = max(strt - 256, 1);
-            stop = min(stop + 256, length(y));
+            strt = max(strt - 768, 1);
+            stop = min(stop + 768, length(y));
             
             audio{end + 1} = y(strt:stop);
         end
@@ -349,6 +354,9 @@ for i = 1:length(keys)
     
     % load audio
     [y, fs] = audioread(fullfile(pth, keys{i}));
+    if size(y, 2) > 1
+        y = y(:, 1);
+    end
     
     % score
     [scores, len] = match_syllables(y, fs, ne_templates{:});
@@ -477,6 +485,9 @@ for i = 1:length(keys)
     
     % load audio
     [y, fs] = audioread(fullfile(pth, keys{i}));
+    if size(y, 2) > 1
+        y = y(:, 1);
+    end
     
     % score
     [scores, len] = match_syllables(y, fs, templates{syllable});
@@ -508,6 +519,8 @@ for i = 1:length(keys)
     clrs = bone(256);
     colormap(clrs(end:-1:1, :));
     axis xy;
+    
+    title(keys{i}, 'Interpreter', 'none');
 
     ax2 = subplot(3, 1, 2); 
     plot(tms, scores);

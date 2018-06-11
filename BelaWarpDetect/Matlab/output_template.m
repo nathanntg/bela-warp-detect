@@ -1,10 +1,10 @@
 %% setup
-pth = '/Volumes/screening/llb3/';
-fl = 'llb3_annotation_ordered.mat';
+pth = '~/Documents/School/BU/Gardner Lab/Syllable Match/llb3/summer';
+fl = 'llb3_annotation_06102018.mat';
 
 load(fullfile(pth, fl));
 
-window_length = 512;
+window_length = 256;
 window_stride = 60;
 log_power = false;
 
@@ -40,6 +40,9 @@ for syllable = syllables
 
         % load audio
         [y, fs] = audioread(fullfile(pth, keys{i}));
+        if size(y, 2) > 1
+            y = y(:, 1);
+        end
         
         % resample
         if bela_fs ~= fs
@@ -56,8 +59,8 @@ for syllable = syllables
             end
             
             % add a little padding
-            strt = max(strt - 256, 1);
-            stop = min(stop + 256, length(y));
+            strt = max(strt - 768, 1);
+            stop = min(stop + 768, length(y));
             
             audio{end + 1} = y(strt:stop);
         end

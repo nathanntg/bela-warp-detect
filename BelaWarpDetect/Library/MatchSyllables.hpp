@@ -102,7 +102,7 @@ private:
     
     // parameters
     const unsigned int _buffer_length = 2097152;
-    const unsigned int _window_length = 512;
+    const unsigned int _window_length = 256;
     const unsigned int _window_stride = 60;
     const float _freq_lo = 850.0f;
     const float _freq_hi = 9000.0f;
