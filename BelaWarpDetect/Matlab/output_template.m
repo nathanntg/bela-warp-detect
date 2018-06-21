@@ -59,8 +59,8 @@ for syllable = syllables
             end
             
             % add a little padding
-            strt = max(strt - 768, 1);
-            stop = min(stop + 768, length(y));
+            strt = max(strt - 256, 1);
+            stop = min(stop + 256, length(y));
             
             audio{end + 1} = y(strt:stop);
         end

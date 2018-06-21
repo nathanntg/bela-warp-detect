@@ -26,29 +26,29 @@ struct ms_dtm {
     int last_len;
     
     ms_dtm(size_t index_, const std::vector<std::vector<float>> &tmpl, float threshold_, float threshold_length_) : index(index_), dtm(tmpl), threshold(threshold_), threshold_length(threshold_length_), last_score(0.f), last_len(0) {
-        float a;
-        size_t dtm_length = dtm.GetLength();
-        std::vector<float> alpha(dtm_length);
-        for (size_t i = 0, maxi = (dtm_length / 2) + 1; i < maxi; ++i) {
-            a = 2.f + 1.f * pow(0.9f, static_cast<float>(i));
-            alpha[i] = a;
-            alpha[dtm_length - 1 - i] = a;
-        }
-        
-        dtm.SetAlpha(alpha);
+//        float a;
+//        size_t dtm_length = dtm.GetLength();
+//        std::vector<float> alpha(dtm_length);
+//        for (size_t i = 0, maxi = (dtm_length / 2) + 1; i < maxi; ++i) {
+//            a = 2.f + 1.f * pow(0.9f, static_cast<float>(i));
+//            alpha[i] = a;
+//            alpha[dtm_length - 1 - i] = a;
+//        }
+//
+        dtm.SetAlpha(10.);
     }
     
     ms_dtm(size_t index_, const float *tmpl, size_t length, size_t features, float threshold_, float threshold_length_) : index(index_), dtm(tmpl, length, features), threshold(threshold_), threshold_length(threshold_length_), last_score(0.f), last_len(0) {
-        float a;
-        size_t dtm_length = dtm.GetLength();
-        std::vector<float> alpha(dtm_length);
-        for (size_t i = 0, maxi = (dtm_length / 2) + 1; i < maxi; ++i) {
-            a = 2.f + 1.f * pow(0.9f, static_cast<float>(i));
-            alpha[i] = a;
-            alpha[dtm_length - 1 - i] = a;
-        }
-        
-        dtm.SetAlpha(alpha);
+//        float a;
+//        size_t dtm_length = dtm.GetLength();
+//        std::vector<float> alpha(dtm_length);
+//        for (size_t i = 0, maxi = (dtm_length / 2) + 1; i < maxi; ++i) {
+//            a = 2.f + 1.f * pow(0.9f, static_cast<float>(i));
+//            alpha[i] = a;
+//            alpha[dtm_length - 1 - i] = a;
+//        }
+//
+        dtm.SetAlpha(10.0);
     }
 };
 

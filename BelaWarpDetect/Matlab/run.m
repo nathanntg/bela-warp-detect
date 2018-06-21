@@ -1,8 +1,6 @@
 %% setup
 pth = '~/Documents/School/BU/Gardner Lab/Syllable Match/llb3/summer';
 fl = 'llb3_annotation_06102018.mat';
-pth = '~/Documents/School/BU/Gardner Lab/Syllable Match/llb3/spring';
-fl = 'llb3_auto_annotation.mat';
 
 load(fullfile(pth, fl));
 
@@ -80,6 +78,7 @@ end
 
 %% optional: transitions
 pairs = [6 1; 6 3; 7 3; 7 8; 7 13; 13 3; 13 8; 13 14; 14 4; 14 6; 14 13; 15 8; 15 24];
+pairs = [1 2];
 
 oldElements = elements;
 for i = 1:length(elements)
@@ -131,21 +130,40 @@ for i = 1:length(elements)
     elements{i}.segType = newType(idx);
 end
 
-%% optional: combine 6 -> 3 -> 3
+%% optional: combine 5 -> 3 -> 3
 oldElements = elements;
-newSyllableType = 633;
+newSyllableType = 533;
 for i = 1:length(elements)
     type = elements{i}.segType(:);
     fileStartTimes = elements{i}.segFileStartTimes(:);
     fileEndTimes = elements{i}.segFileEndTimes(:);
     
-    idx = type(1:(end-2)) == 6 & type(2:(end-1)) == 3 & type(3:end) == 3 & fileEndTimes(1:(end-2)) + 0.25 > fileStartTimes(2:(end-1)) & fileEndTimes(2:(end-1)) + 0.15 > fileStartTimes(3:end);
+    idx = type(1:(end-2)) == 2 & type(2:(end-1)) == 3 & type(3:end) == 3 & fileEndTimes(1:(end-2)) + 0.25 > fileStartTimes(2:(end-1)) & fileEndTimes(2:(end-1)) + 0.15 > fileStartTimes(3:end);
     
     elements{i}.segAbsStartTimes = elements{i}.segAbsStartTimes([idx; false; false]);
     elements{i}.segFileStartTimes = elements{i}.segFileStartTimes([idx; false; false]);
     elements{i}.segFileEndTimes = elements{i}.segFileEndTimes([false; false; idx]);
     elements{i}.segType = ones(sum(idx), 1) * newSyllableType;
 end
+
+
+%% optional: combine 5 -> 5 -> 3 -> 3
+oldElements = elements;
+newSyllableType = 5533;
+for i = 1:length(elements)
+    type = elements{i}.segType(:);
+    fileStartTimes = elements{i}.segFileStartTimes(:);
+    fileEndTimes = elements{i}.segFileEndTimes(:);
+    
+    idx = type(1:(end-3)) == 2 & type(2:(end-2)) == 2 & type(3:(end-1)) == 3 & type(4:end) == 3 & ...
+        fileEndTimes(1:(end-3)) + 0.25 > fileStartTimes(2:(end-2)) & fileEndTimes(2:(end-2)) + 0.25 > fileStartTimes(3:(end-1)) & fileEndTimes(3:(end-1)) + 0.15 > fileStartTimes(4:end);
+    
+    elements{i}.segAbsStartTimes = elements{i}.segAbsStartTimes([idx; false; false; false]);
+    elements{i}.segFileStartTimes = elements{i}.segFileStartTimes([idx; false; false; false]);
+    elements{i}.segFileEndTimes = elements{i}.segFileEndTimes([false; false; false; idx]);
+    elements{i}.segType = ones(sum(idx), 1) * newSyllableType;
+end
+
 
 %% list of syllables
 segType = cellfun(@(x) x.segType, elements, 'UniformOutput', false);
@@ -185,8 +203,8 @@ for syllable = syllables
             end
             
             % add a little padding
-            strt = max(strt - 768, 1);
-            stop = min(stop + 768, length(y));
+            strt = max(strt - 256, 1);
+            stop = min(stop + 256, length(y));
             
             audio{end + 1} = y(strt:stop);
         end
@@ -337,7 +355,7 @@ all_predict = cell(length(keys), length(templates));
 all_scores = cell(length(keys), length(templates));
 all_truth = cell(length(keys), length(templates));
 
-len_threshold = 0.25;
+len_threshold = 0.35;
 
 idx = 0;
 for i = 1:length(keys)
@@ -471,8 +489,8 @@ for i = 1:length(templates)
 end
 
 %% show results
-syllable = 222;
-threshold = 0.577435;
+syllable = 5533;
+threshold = 0.906645;
 
 for i = 1:length(keys)
     if ~exist(fullfile(pth, keys{i}), 'file')
